@@ -1,0 +1,393 @@
+---
+title: "20190918"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+StuDF <- data.frame(
+  次序=c(1,2,3,4,5,6,7,8),
+  學號=c(172,214,322,425,517,833,752,114),
+  姓名=c("小明","大雄","胖虎","小新","大白","阿華","小英","阿美"),
+  性別=c("男","男","男","女","女","男","女","男"),
+  成績=c(80,42,90,82,50,77,30,90)
+  )
+StuDF
+```
+
+
+```{r}
+str(StuDF) # structure 分析結構
+head(StuDF)
+tail(StuDF)
+
+ 
+StuDF
+slice(StuDF,1:3)
+slice(StuDF,4:5)
+slice(StuDF,n()) # n() = 最後一列
+StuDF
+slice(StuDF,-(5:7)) # exclude 5 to 7 
+slice(StuDF,c(-5,-6,-7))
+slice(StuDF,c(1,4,6:8))# slice 接受跳躍式選擇
+```
+
+
+```{r}
+library(readr)
+collegeData <- read_csv("https://raw.githubusercontent.com/tpemartin/github-data/master/103_student.csv")
+
+```
+
+
+```{r}
+#檢查變數結構
+str(collegeData)
+#前4筆,後3筆,第101筆到110筆
+slice(collegeData,c(1:4),(n()-2):n(),c(101:110))
+```
+
+
+```{r}
+# mutate & summarise :data frame 已有的欄位 就直接可以使用
+StuDF
+mutate(StuDF,
+       調分後成績=成績+10)
+transmute(StuDF,
+       調分後成績=成績+10) # 與mutate相比,不保留其他變數
+
+StuDF
+mutate(StuDF,
+       調分後成績=成績+10) -> StuDF
+```
+
+
+```{r}
+StuDF
+StuDF <- mutate(StuDF,
+       調分後成績=成績+10) 
+
+#不使用dplyr則必需使用$取出變數向量(list角度)
+StuDF$調分後成績 <-
+  StuDF$成績+10
+
+```
+
+
+```{r}
+collegeData
+##新增男生變數 dplyr
+mutate(collegeData,
+       男生=一年級男生+二年級男生+三年級男生+四年級男生) -> collegeData 
+##新增女生變數 list
+collegeData$女生 <-
+collegeData$一年級女生+collegeData$二年級女生+collegeData$三年級女生+collegeData$四年級女生 
+##新增男女生比
+mutate(collegeData,
+       男女生比=男生/女生) -> collegeData
+collegeData
+```
+
+
+```{r}
+StuDF
+# summarise 是另創一個 data frame
+summarise(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+
+StuDF <- mutate(StuDF,
+        最高分=max(成績),
+        最低分=min(成績),
+        調分後成績 = 成績 + (最高分-最低分/5) )
+StuDF
+```
+
+
+```{r}
+StuDF
+mutate(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績)) -> StuDF2
+
+StuDF2
+names(StuDF2) #顯示物件內元素名稱 dataframe 欄位名稱
+select(StuDF2,
+       姓名,學號,成績,調分後成績)
+select(StuDF2,
+       -次序,-性別,-最高分,-最低分,-平均成績)
+```
+
+
+```{r}
+select(StuDF2,
+       次序,性別,
+       contains("最"))
+
+select(StuDF2,
+       -次序,-性別,
+       -contains("最"))
+
+select(collegeData,
+       contains("男生"))
+```
+
+
+```{r}
+StuDF
+# logical vector: TRUE,FALSE
+logiChoose <- c(
+  F,F,F,T,T,F,T,F
+)
+# 使用logical vector選擇所要觀測值"女"
+StuDF[logiChoose,]
+```
+
+
+```{r}
+logiChoose
+which(logiChoose) #哪些row是True
+slice(
+  StuDF,which(logiChoose)
+)
+
+StuDF$性別=="女" # logical predicate
+
+logiChoose <- StuDF$性別=="女"
+StuDF[logiChoose,]
+```
+
+
+```{r}
+# relational operators
+StuDF$性別 == "女" 
+StuDF$成績 > 60
+
+# combined with logical operator
+(StuDF$性別 == "女" & StuDF$成績 > 60) -> logiChoose2
+logiChoose2
+
+StuDF[logiChoose2,]
+```
+
+
+```{r}
+StuDF
+filter(StuDF,
+       性別=="女")
+filter(StuDF,
+       (性別=="女" & 成績>60))
+filter(StuDF,
+       性別=="女",
+       成績>60) # 多個AND條件可用','分隔
+```
+
+
+```{r}
+StuDF
+StuDF3 <- select(StuDF,性別,成績)
+gscore <- filter(StuDF3,性別=="女",成績)
+gscore <- summarise(gscore,
+          平均成績 = mean(成績),
+          最高分= max(成績),
+          最低分= min(成績))
+gscore
+
+StuDF3 <- select(StuDF,性別,成績)
+bscore <- filter(StuDF3,性別=="男",成績)
+bscore <- summarise(bscore,
+          平均成績 = mean(成績),
+          最高分= max(成績),
+          最低分= min(成績))
+bscore
+```
+
+
+```{r}
+collegeData
+#選出台北市
+collegeData1 <- filter(collegeData,縣市名稱 == "30 臺北市")
+#選出台北市或新北市
+collegeData2 <- filter(collegeData,
+       縣市名稱=="30 臺北市"|
+       縣市名稱=="01 新北市")
+collegeData2
+```
+
+
+```{r}
+#產生grouped data frame，用在mutate/transmute/summarise時會產生分群計算效果
+group_by(StuDF,
+         性別) -> StuDF_by性別
+
+# 使用grouped data frame
+summarise(StuDF_by性別,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+
+# 使用ungrouped data frame
+summarise(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+```
+
+
+```{r}
+group_by(StuDF,
+         性別) -> StuDF_by性別
+
+# 使用grouped data frame
+mutate(StuDF_by性別,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+
+# 使用ungrouped data frame
+mutate(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+```
+
+
+```{r}
+mutate(
+  StuDF_by性別,
+  最高分=max(成績),
+  最低分=min(成績),
+  調分大小=(最高分-最低分)/5,
+  調分後成績=成績+調分大小
+) -> StuDF_依性別調分
+StuDF_依性別調分
+
+group_by(StuDF,
+         性別,
+         (成績>75)) -> StuDF_by性別成績
+
+summarise(StuDF_by性別成績,
+          平均成績=mean(成績),
+          人數=n())
+
+ungroup(StuDF_依性別調分) -> 
+  StuDF_調分後
+```
+
+
+```{r}
+#計算collegeData中不同縣市名稱、體系別、等級別的一年級男生及一年級女生總數（使用sum）和學校數目
+
+group_by(collegeData,縣市名稱,體系別) -> collegeby_g
+summarise(collegeby_g,
+       一年級男生總數 = sum(一年級男生),
+       一年級女生總數 = sum(一年級女生),
+       學校數目 = length(unique(學校名稱)))
+
+group_by(collegeData,縣市名稱,體系別,等級別) -> collegeby_g
+summarise(collegeby_g,
+       一年級男生總數 = sum(一年級男生),
+       一年級女生總數 = sum(一年級女生),
+       學校數目 = length(unique(學校名稱)))
+```
+
+
+```{r}
+# group_by(StuDF,
+#          性別) -> StuDF_by性別
+StuDF %>% group_by(
+         性別) -> StuDF_by性別
+
+# mutate(
+#   StuDF_by性別,
+#   最高分=max(成績),
+#   最低分=min(成績),
+#   調分大小=(最高分-最低分)/5,
+#   調分後成績=成績+調分大小
+# ) -> StuDF_依性別調分
+
+StuDF_by性別 %>%
+mutate(
+  最高分=max(成績),
+  最低分=min(成績),
+  調分大小=(最高分-最低分)/5,
+  調分後成績=成績+調分大小
+) -> StuDF_依性別調分
+
+
+# ungroup(StuDF_依性別調分) -> 
+#   StuDF_調分後
+StuDF_依性別調分 %>% ungroup() -> 
+  StuDF_調分後
+```
+
+
+```{r}
+StuDF %>% group_by(
+         性別)  %>%
+mutate(
+  最高分=max(成績),
+  最低分=min(成績),
+  調分大小=(最高分-最低分)/5,
+  調分後成績=成績+調分大小
+)  %>% ungroup() -> 
+  StuDF_調分後
+```
+
+
+```{r}
+StuDF %>% # 將StuDF
+  group_by(性別) %>% # 依性別分群
+  mutate( # 接著計算各群的:
+    最高分=max(成績),
+    最低分=min(成績),
+    調分大小=(最高分-最低分)/5,
+    調分後成績=成績+調分大小
+  )  %>% 
+  ungroup() -> # 接著ungroup後輸出
+  StuDF_調分後
+```
+將collegeData，
+
+依等級別,縣市名稱分群後,
+
+計算一年級男/女生比例後,
+
+找出男女生比例最高的等級別,縣市名稱組合。
+
+```{r}
+collegeData %>%
+  group_by(等級別,縣市名稱)%>%
+  summarise(一男 = sum(一年級男生),
+            一女 = sum(一年級女生),
+            男女比例 = 一男/一女,
+                   )%>%
+  ungroup() -> collegeresult
+
+collegeresult[which.max(collegeresult$男女比例),]
+```
+
+
+```{r}
+load(url("https://www.dropbox.com/s/duh5aaqgl2f5m3z/loopTranscriptData.Rda?raw=1"))
+```
+
+
+```{r}
+transcriptDataFinal%>%
+  group_by(學號,學年,學期)%>%
+  summarise(
+    平均成績 = sum(學期成績*學分數)/sum(學分數)
+  )
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
