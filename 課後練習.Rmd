@@ -1,0 +1,57 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+load(url("https://www.dropbox.com/s/duh5aaqgl2f5m3z/loopTranscriptData.Rda?raw=1"))
+```
+
+
+```{r}
+transcriptDataFinal%>%
+  group_by(學號,學年,學期)%>%
+  summarise(
+    平均成績 = sum(學期成績*學分數)/sum(學分數)
+  )
+```
+
+
+```{r}
+transcriptDataFinal%>%
+  group_by(學號,學年,學期,`必選修類別（必∕選∕通）`)%>%
+  summarise(
+    學分數 = sum(學分數)
+  )->resultofclass
+
+resultofclass
+```
+
+
+```{r}
+(transcriptDataFinal$學屆 == 100 & transcriptDataFinal$學期成績 >= 60) -> logichoose
+
+transcriptDataFinal[logichoose,]%>%
+  group_by(學號,學屆,學系)%>%
+  summarise(
+    總學分數 = sum(學分數)
+  )%>%
+  group_by(學系)%>%
+  summarise(
+    中位數 = median(總學分數)
+  )
+```
+
+
+```{r}
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
