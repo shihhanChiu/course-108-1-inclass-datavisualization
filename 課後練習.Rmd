@@ -8,6 +8,19 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext)
+
+font_add(family="QYuan",regular="C:/Users/Shihhan/Desktop/cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+font.families()
+```
+
+
+```{r}
 load(url("https://www.dropbox.com/s/duh5aaqgl2f5m3z/loopTranscriptData.Rda?raw=1"))
 ```
 
