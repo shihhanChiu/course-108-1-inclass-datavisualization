@@ -1,0 +1,109 @@
+---
+title: "每週一圖作業-1005"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext)
+
+font_add(family="QYuan",regular="C:/Users/Shihhan/Desktop/cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+
+此部份在做：
+
+  * 原始Rda資料引入（即引入**dataList**物件）；
+  
+  * 資料清理成作圖用graphData物件。
+
+請將你最原始的資料連同作業一起上傳到作業上傳網址：  
+  * 若「原始資料為網頁下載」，且下載指令寫在data cleaning chunk裡的話，可以不用上傳「資料」。  
+  * 若原始資料有很多個檔案，請先引入成data frame並存在「一個」.Rda檔裡上傳（如`example_data.Rda`檔）。  
+
+資料檔引入到進入作圖前的資料處理請寫在下面區塊，分二部份：
+
+  * 資料處理  
+  * 作圖用資料物件生成
+  
+```{r data cleaning, echo=TRUE, eval=T}
+# 資料引入
+library(readr)
+travelerFromAboard<- read_csv("https://gis.taiwan.net.tw/od/01_PRD/%E6%AD%B7%E5%B9%B4%E4%BE%86%E5%8F%B0%E6%97%85%E5%AE%A2%E5%9C%8B%E7%B1%8D%E7%B5%B1%E8%A8%88.csv", 
+    locale = locale(encoding = "BIG5"))
+#View(travelerFromAboard)
+
+graphData <- list()
+```
+
+
+```{r data cleaning, echo=TRUE, eval=T}
+# 資料處理
+str_replace_all(travelerFromAboard$`2007`,"-","0") -> travelerFromAboard$`2007`
+str_replace_all(travelerFromAboard$`2008`,"-","0") -> travelerFromAboard$`2008`
+str_replace_all(travelerFromAboard$`2009`,"-","0") -> travelerFromAboard$`2009`
+str_replace_all(travelerFromAboard$`2007`,",","")-> travelerFromAboard$`2007`
+str_replace_all(travelerFromAboard$`2008`,",","")-> travelerFromAboard$`2008`
+str_replace_all(travelerFromAboard$`2009`,",","")-> travelerFromAboard$`2009`
+as.double(travelerFromAboard$`2007`)->travelerFromAboard$`2007`
+as.double(travelerFromAboard$`2008`)->travelerFromAboard$`2008`
+as.double(travelerFromAboard$`2009`)->travelerFromAboard$`2009`
+#str(travelerFromAboard)
+
+select(travelerFromAboard,-(1:2)) -> test 
+test / 10000 -> test
+round(test,digits = 2) -> roundTraveler
+
+travelerFromAboard%>%
+  select(-contains("20"))%>%
+  cbind.data.frame(roundTraveler)%>%
+  gather(starts_with("20"), key="年分",value="人數")%>%
+  filter(國籍 == "亞洲地區")%>%
+  select(-國籍)%>%
+  group_by(細分)%>%
+  gather(starts_with("20"),key = "年分",value = "人數")%>%
+  mutate(
+    "地區" = `細分`,
+    "年分" = `年分`,
+    "來台旅遊人數(萬)" = `人數`
+  )%>%
+  ungroup()->travelerFromAsia
+
+select(travelerFromAsia,-(細分)) -> travelerFromAsia
+select(travelerFromAsia,-(人數)) -> travelerFromAsia
+
+travelerFromAsia%>%
+  filter(地區 == "印度 India" |地區 == "中東 Middle East" | 地區 == "東南亞地區 東南亞小計 Sub-Total" | 地區 == "日本 Japan" |地區 == "韓國 Korea,Republic of" | 地區 == "亞洲其他地區 Others" | 地區 == "亞洲合計 Total")->graphData$travelerFromAsia
+#作圖用資料物件生成：處理好可進行作圖的資料請存在一個名為graphData的list物件裡
+```
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+graphData$travelerFromAsia %>%
+  ggplot(aes(x=`年分`,y=`來台旅遊人數(萬)`,fill=地區)) +
+    geom_bar(stat="identity", position=position_dodge())
+
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***之後
+
+*** 
+
+1. 圖為台灣2002年至2016年的亞洲地區外國來台旅遊人數趨勢，其中最顯著的變化是，於2003年時，亞洲地區總來台人數從157.92萬跌落至124.51萬，以及在2009年則從211.62萬人減少至192.87萬人，其他年分人數呈現逐漸上升趨勢。日本旅客在亞洲地區來台人數中為多數，其趨勢與亞洲地區總人數相似。
+
+2. 選用長條圖的原因為能清楚觀察出各國家人數量高低落差。
+
+
+
