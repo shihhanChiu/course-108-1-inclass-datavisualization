@@ -45,10 +45,7 @@ travelerFromAboard<- read_csv("https://gis.taiwan.net.tw/od/01_PRD/%E6%AD%B7%E5%
 #View(travelerFromAboard)
 
 graphData <- list()
-```
 
-
-```{r data cleaning, echo=TRUE, eval=T}
 # 資料處理
 str_replace_all(travelerFromAboard$`2007`,"-","0") -> travelerFromAboard$`2007`
 str_replace_all(travelerFromAboard$`2008`,"-","0") -> travelerFromAboard$`2008`
