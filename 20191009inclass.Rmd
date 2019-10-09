@@ -1,0 +1,257 @@
+---
+title: "20191009inclass"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext)
+
+font_add(family="QYuan",regular="C:/Users/Shihhan/Desktop/cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+font.families()
+```
+
+
+
+```{r}
+
+library(readr)
+disposableIncome <- read_csv("https://www.dropbox.com/s/z80sbjw94cjex8x/disposableIncome.csv?dl=1")
+disposableIncome_gather <- read_csv("https://www.dropbox.com/s/cdw1f10jow4frxb/disposableIncome_gather.csv?dl=1")
+
+```
+
+```{r}
+c('X1','平均每戶可支配所得','可支配所得按戶數五等分位組-最低所得組','可支配所得按戶數五等分位組-次低所得組','可支配所得按戶數五等分位組-中間所得組','可支配所得按戶數五等分位組-次高所得組','可支配所得按戶數五等分位組-最高所得組') -> names(disposableIncome)
+c('年','平均每戶可支配所得','所得組距','可支配所得') -> names(disposableIncome_gather)
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+disposableIncome %>%
+  mutate(
+    年=as.integer(X1)
+  ) -> disposableIncome
+disposableIncome %>%
+  ggplot(aes(x=年,y=平均每戶可支配所得))+
+  geom_line(linetype="dashed")
+```
+
+
+```{r}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/graphData_homework2019-10-08_014.Rda?raw=true"))
+```
+
+
+```{r}
+c('年分','地區','來台旅遊人數(萬)') -> names(graphData$travelerFromAsia)
+```
+
+
+```{r}
+as.numeric(graphData$travelerFromAsia$年分)->graphData$travelerFromAsia$年分
+graphData$travelerFromAsia %>%
+  ggplot(aes(x=`年分`,y=`來台旅遊人數(萬)`,color = 地區, linetype = 地區)) +
+  geom_line()
+```
+
+
+```{r}
+dataCPI <- read_csv("https://www.dropbox.com/s/ov2bvef5o3apei0/PR0101A2Mc.csv?dl=1")
+
+## 改變數名稱
+dataCPI %>% 
+  dplyr::rename(
+    年月=X1,
+    CPI=原始值
+  ) -> dataCPI
+
+# 移除「有NA」的row
+dataCPI %>% na.omit() -> dataCPI
+
+## 調整class
+dataCPI$年月 %>% str_c("/01") %>% #擴增為YMD表示
+  ymd() -> dataCPI$年月
+
+# 改成2003M1為基期,其指數為100
+dataCPI %>% filter(年月==ymd("2003-01-01")) %>% 
+  select(CPI) -> CPI2003M1
+dataCPI %>% 
+  mutate(CPI=CPI/CPI2003M1$CPI*100) -> dataCPI2
+```
+
+
+```{r}
+dataCPI2 %>% ggplot()+
+  geom_line(aes(x=年月,y=CPI)) -> basePlot2
+basePlot2
+
+basePlot2 +
+  scale_x_date(limits=c(ymd("2003-01-01"),NA))+
+  scale_y_continuous(limits=c(80,NA))
+```
+
+
+```{r}
+library(readr)
+disposableIncome <- read_csv("https://www.dropbox.com/s/z80sbjw94cjex8x/disposableIncome.csv?dl=1")
+disposableIncome_gather <- read_csv("https://www.dropbox.com/s/cdw1f10jow4frxb/disposableIncome_gather.csv?dl=1")
+```
+
+
+```{r}
+disposableIncome_gather %>%
+  ggplot(aes(x=年,y=可支配所得))+
+  geom_line(
+    aes(linetype=所得組距)
+  ) +
+  scale_linetype_manual(
+    values=c("15","24","34","51","71"),
+    limits=c(
+    "可支配所得按戶數五等分位組-次低所得組",
+    "可支配所得按戶數五等分位組-中間所得組",
+    "可支配所得按戶數五等分位組-次高所得組")
+  )
+```
+
+
+```{r}
+disposableIncome_gather %>%
+  ggplot(aes(x=年,y=可支配所得))+
+  geom_line(
+    aes(linetype=所得組距)
+  ) +
+  scale_linetype_manual(
+    values=c("scale","24","34","51","71"),
+    breaks=c(
+    "可支配所得按戶數五等分位組-次低所得組",
+    "可支配所得按戶數五等分位組-中間所得組",
+    "可支配所得按戶數五等分位組-次高所得組")
+  )
+```
+
+
+```{r}
+breakDates <- c("2003-01-01",
+                "2005-01-01","2010-01-01","2015-01-01",
+                "2018-01-01")
+breakDates %>% ymd() -> breakDates
+
+breakLabels <- c("2003",
+                 "2005","2010","2015",
+                 "2018")
+basePlot2 +
+  scale_x_date(limits=c(ymd("2003-01-01"),NA),
+               breaks = breakDates,
+               labels = breakLabels)
+```
+
+
+```{r}
+library(magrittr)
+disposableIncome_gather$所得組距 %<>%
+  factor(levels=c(
+    "可支配所得按戶數五等分位組-最低所得組",
+    "可支配所得按戶數五等分位組-次低所得組",
+    "可支配所得按戶數五等分位組-中間所得組",
+    "可支配所得按戶數五等分位組-次高所得組",
+    "可支配所得按戶數五等分位組-最高所得組"
+  )) 
+
+disposableIncome_gather %>%
+  ggplot(aes(x=年,y=可支配所得))+
+  geom_line(
+    aes(linetype=所得組距,size=所得組距)
+  ) +
+  scale_linetype_manual(
+    values=c("15","24","34","51","71")
+  ) +
+  scale_size_manual(
+    values=c(0.1,0.3,0.3,0.5,0.7)*1.5
+  ) -> p_linetype
+p_linetype
+```
+
+
+```{r}
+basePlot2 +
+  scale_x_date(limits=c(ymd("2003-01-01"),NA),
+               breaks = breakDates,
+               labels = function(x) year(x)-1911)
+```
+
+
+```{r}
+disposableIncome_gather %>%
+  group_by(所得組距) %>%
+  summarise(
+    最後一年=last(年),
+    可支配所得=last(可支配所得)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    所得組=stringr::str_replace(
+      as.character(所得組距),"可支配所得按戶數五等分位組-","")
+    )-> disposableIncome_gather_legend
+
+disposableIncome_gather %>%
+  ggplot(aes(x=年,y=可支配所得))+
+  geom_line(
+    aes(linetype=所得組距)
+  ) +
+  scale_linetype_manual(
+    values=c("15","24","34","51","71"),
+    breaks=c(
+    "可支配所得按戶數五等分位組-次低所得組",
+    "可支配所得按戶數五等分位組-中間所得組",
+    "可支配所得按戶數五等分位組-次高所得組")
+    ) +
+  theme(legend.position = "none") + # 取消legend
+  geom_text(
+    data=disposableIncome_gather_legend,
+    aes(
+      x=最後一年,
+      y=可支配所得,
+      label=所得組
+    ),
+    nudge_x= 3, size=4
+  )
+```
+
+
+```{r}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/graphData_homework2019-10-07_001.Rda?raw=true"))
+```
+
+
+```{r}
+library(grDevices) # 不同顏色模型代碼的呈現及轉換
+library(scales) # show_col()螢幕立即顯示顏色
+library(colorspace) # 調色盤選擇及ggplot應用工具
+library(shinyjs) # 支援套件
+#choose_palette(gui="shiny")
+colorspace::sequential_hcl(n = 7, h = -33, c = c(90, NA, NA), l = c(60, 98), power = 1.3, rev = TRUE,register = "liberate-palette")-> a
+show_col(a)
+
+```
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
