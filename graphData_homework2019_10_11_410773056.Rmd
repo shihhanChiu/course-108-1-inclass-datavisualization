@@ -1,0 +1,136 @@
+---
+title: "每週一圖作業"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext)
+
+font_add(family="QYuan",regular="C:/Users/Shihhan/Desktop/cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+
+此部份在做：
+
+  * 原始Rda資料引入（即引入**dataList**物件）；
+  
+  * 資料清理成作圖用graphData物件。
+
+請將你最原始的資料連同作業一起上傳到作業上傳網址：  
+  * 若「原始資料為網頁下載」，且下載指令寫在data cleaning chunk裡的話，可以不用上傳「資料」。  
+  * 若原始資料有很多個檔案，請先引入成data frame並存在「一個」.Rda檔裡上傳（如`example_data.Rda`檔）。  
+
+資料檔引入到進入作圖前的資料處理請寫在下面區塊，分二部份：
+
+  * 資料處理  
+  * 作圖用資料物件生成(最後形成作圖資料物件graphData)
+  
+```{r data cleaning, echo=TRUE, eval=T}
+#資料引入
+
+library(readr)
+birthNum107 <- read_csv("http://data.moi.gov.tw/MoiOD/System/DownloadFile.aspx?DATA=5F11E0E0-8F23-4F95-B187-E15F6EF8AAE6", 
+    locale = locale(encoding = "UTF-8"))
+View(birthNum107)
+
+graphData <- list()
+
+#資料整理
+
+
+c("統計年度","按照別","區域別","胎次","出生者性別","生母年齡","嬰兒出生人數") -> names(birthNum107)
+#names(birthNum107)
+
+slice(birthNum107,-1) -> birthNum107
+
+birthNum107%>%
+  mutate(
+    嬰兒出生人數 = as.numeric(birthNum107$嬰兒出生人數)
+  ) -> birthNum107_1
+
+select(birthNum107_1,-c(1:2)) -> birthNum107_1
+str_detect(birthNum107_1$區域別,"宜蘭") -> rowsYilan
+birthNum107_1[rowsYilan,] -> birth_Yilan
+
+birth_Yilan %>%
+  group_by(
+    區域別
+  )%>%
+  summarise(
+    嬰兒出生人數 = sum(嬰兒出生人數)
+  )%>%
+  ungroup()%>%
+  mutate(
+    區域別 = str_replace_all(區域別,"宜蘭縣","")
+  )%>%
+  arrange_at(desc("嬰兒出生數")) -> birthSum_Yilan_arranged
+
+(birthSum_Yilan_arranged$區域別) -> nameOfarranged
+
+birthSum_Yilan_arranged%>%
+  mutate(
+    區域別 = factor(區域別,levels = c(nameOfarranged))
+  ) -> graphData$birthSum_Yilan_arranged
+
+```
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+library(grDevices) # 不同顏色模型代碼的呈現及轉換
+library(scales) # show_col()螢幕立即顯示顏色
+library(colorspace) # 調色盤選擇及ggplot應用工具
+library(shinyjs) # 支援套件
+
+#choose_palette(gui = "shiny")
+colorspace::sequential_hcl(n = 12, h = 4, c = c(85, NA, NA), l = c(25, 95), power = 1.3, rev = TRUE, register = "birth_Palette") -> a
+#show_col(a)
+
+graphData$birthSum_Yilan_arranged %>%
+  ggplot(aes(x = 區域別, y = 嬰兒出生人數))+
+  geom_col(
+    aes(fill = 區域別), width = 0.5)+
+      scale_fill_discrete_sequential(
+    palette = "birth_Palette", 
+    nmax = 12
+  )+ 
+  geom_text(
+    aes(
+      label = 嬰兒出生人數
+      )
+    , 
+    size = 7, color = "black", nudge_y = 11
+  )+
+  theme(legend.position = "none")+
+  labs(title = "107年宜蘭縣各鄉鎮嬰兒出生人口數" ,caption = "資料來源處：政府資料開放平台" )+
+  theme(
+    panel.background = element_rect(fill = "#FFFFE0" ,
+                                    colour = "black",
+                                    size = 1),
+    plot.title = element_text(face = "bold" , size = 50, hjust = 0.5),
+    plot.caption = element_text(face = "bold" , size = 20, hjust = 1),
+    axis.title.x = element_text(face = "bold" , size = 25),
+    axis.title.y = element_text(face = "bold" , size = 25),
+    axis.text.x.bottom = element_text(face = "bold" , size = 25),
+    axis.text.y.left = element_text(face = "bold" , size = 20)
+  )
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***之後
+
+*** 
+
+此圖為民國107年宜蘭地區各鄉鎮嬰兒出生人口數，最高數量位於宜蘭市，共586人(佔總數約19%)，最低人數則在大同鄉，共86人(佔總數約3%)。
