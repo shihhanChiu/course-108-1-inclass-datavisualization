@@ -111,7 +111,7 @@ graphData$birthSum_Yilan_arranged %>%
       label = 嬰兒出生人數
       )
     , 
-    size = 7, color = "black", nudge_y = 11
+    size = 5, color = "black", nudge_y = 11
   )+
   theme(legend.position = "none")+
   labs(title = "107年宜蘭縣各鄉鎮嬰兒出生人口數" ,caption = "資料來源處：政府資料開放平台" )+
@@ -119,12 +119,12 @@ graphData$birthSum_Yilan_arranged %>%
     panel.background = element_rect(fill = "#FFFFE0" ,
                                     colour = "black",
                                     size = 1),
-    plot.title = element_text(face = "bold" , size = 50, hjust = 0.5),
-    plot.caption = element_text(face = "bold" , size = 20, hjust = 1),
-    axis.title.x = element_text(face = "bold" , size = 25),
-    axis.title.y = element_text(face = "bold" , size = 25),
-    axis.text.x.bottom = element_text(face = "bold" , size = 25),
-    axis.text.y.left = element_text(face = "bold" , size = 20)
+    plot.title = element_text(face = "bold" , size = 20, hjust = 0.5),
+    plot.caption = element_text(face = "bold" , size = 10, hjust = 1),
+    axis.title.x = element_text(face = "bold" , size = 10),
+    axis.title.y = element_text(face = "bold" , size = 10),
+    axis.text.x.bottom = element_text(face = "bold" , size = 10),
+    axis.text.y.left = element_text(face = "bold" , size = 10)
   )
 ```
 
