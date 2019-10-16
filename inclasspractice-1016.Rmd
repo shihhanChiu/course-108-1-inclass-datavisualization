@@ -1,0 +1,243 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext)
+
+font_add(family="QYuan",regular="C:/Users/Shihhan/Desktop/cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+font.families()
+```
+
+
+```{r}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/homework2/graphData_homework2_005.Rda?raw=true"))
+names(graphData$data) <- c("年份", "國民所得_儲蓄_投資毛額", "毛額")
+```
+
+
+```{r}
+graphData$data %>%
+  ggplot(aes(x=年份,y=毛額,color=國民所得_儲蓄_投資毛額))+
+  geom_line(aes(linetype=國民所得_儲蓄_投資毛額,size=國民所得_儲蓄_投資毛額))+
+  scale_linetype_manual(
+    values = c("85","12","31"),
+    breaks = c(
+    "1.4國民所得毛額GNI:1.1+1.2+1.3","3.3國民儲蓄毛額 :2.1+3.2","3.5國內投資毛額"),
+    labels = c("所得毛額","儲蓄毛額","投資毛額")
+    )+
+  theme(legend.position = "none")+
+  scale_size_manual(values = c(1,0.5,0.2))+
+  
+  annotate("text", x = 2016, y = 155000, 
+           label = paste("國民所得毛額"), size = 3)+
+  annotate("text", x = 2016, y = 70000, 
+           label = paste("國民儲蓄毛額"), size = 3) +
+  annotate("text", x = 2016, y = 42000, 
+           label = paste("國民投資毛額"), size = 3) +
+  annotate("text", x = 2010, y = 180000, 
+           label = paste("2009年"), size = 3) +
+  labs(title = "國民所得、儲蓄、投資毛額",
+       caption = "資料來源: 中華民國統計資料網",
+       tag = "單位:億(新台幣)")+
+  
+  geom_vline(aes(xintercept = 2009),linetype="dotted") #-> graphData$originalDesign
+```
+
+
+```{r}
+graphData$events <- 
+  data.frame(
+    start=c(2008,2013),
+    end=c(2009,2014),
+    ymin=c(-Inf,-Inf),
+    ymax=c(Inf,Inf),
+    name=c("次貸危機","歐債危機")
+  )
+graphData$originalDesign +
+  geom_rect(
+    data = graphData$events,
+    mapping = aes(
+      xmin = start,
+      xmax = end,
+      ymin = ymin,
+      ymax = ymax
+    ),
+    inherit.aes = F,alpha = 0.2
+  )+
+  geom_text(
+    data = graphData$events,
+    aes(
+      x = (start+end)/2,
+      y = 180000,
+      label = name,
+    ),
+    inherit.aes = F
+  )
+```
+
+
+```{r}
+startSalaryTopCat<- read_csv("https://raw.githubusercontent.com/tpemartin/github-data/master/startSalaryTopCat.csv")
+
+startSalaryTopCat$大職業別[2:7] %>% str_c(.,collapse="','")
+
+startSalaryTopCat %>% filter(
+  大職業別 %in% c('工業部門','礦業及土石採取業','製造業','電力及燃氣供應業','用水供應及污染整治業','營造業')
+) -> startingSalary_industrial
+
+graphList <- list()
+startingSalary_industrial %>%
+  filter(大職業別 !='工業部門') -> startingSalary_industrial_sub
+startingSalary_industrial_sub %>%  
+  ggplot(aes(x=大職業別))+
+  geom_col(aes(y=`經常性薪資-薪資`))-> graphList$經常薪資_col0
+graphList$經常薪資_col0
+```
+
+
+```{r}
+startingSalary_industrial_sub %>%
+  mutate(
+    大職業別ordered=reorder(大職業別,
+                    `經常性薪資-薪資`,order=T) # order=T才會輸出成ordered factor
+  ) -> startingSalary_industrial_sub
+
+startingSalary_industrial_sub %>%
+  ggplot()+
+  geom_col(
+    aes(x=大職業別ordered,y=`經常性薪資-薪資`)
+  ) -> graphList$經常薪資_x有排序ed_col0
+
+graphList$經常薪資_x有排序ed_col0
+```
+
+
+```{r}
+startingSalary_industrial_sub %>%
+  ggplot()+
+  geom_col(
+    aes(x=reorder(大職業別,`經常性薪資-薪資`,order = T),y=`經常性薪資-薪資`)
+  ) -> graphList$經常薪資_x有排序ed_col1
+
+graphList$經常薪資_x有排序ed_col1
+```
+
+
+```{r}
+breaks_order <- levels(startingSalary_industrial_sub$大職業別ordered)
+startingSalary_industrial_sub %>%
+  ggplot()+
+  geom_col(
+    aes(x=大職業別,y=`經常性薪資-薪資`),width = 0.7
+  )+
+  scale_x_discrete(
+    limits=breaks_order
+  ) -> graphList$經常薪資_x有排序ed_scaleLimits_col0
+
+graphList$經常薪資_x有排序ed_scaleLimits_col0
+
+```
+
+
+```{r}
+graphList$經常薪資_x有排序ed_scaleLimits_col0+
+  theme(aspect.ratio = 1/1.3) -> 
+  graphList$經常薪資_x有排序_scalLimits_gmWidth_asp0_col0
+
+graphList$經常薪資_x有排序_scalLimits_gmWidth_asp0_col0
+```
+
+
+```{r}
+library(readr)
+library100_102 <- read_csv("https://www.dropbox.com/s/wuo5o6l55lk68l6/library100_102.csv?dl=1")
+```
+
+
+```{r}
+library100_102 %>%
+  mutate(
+    借閱日期=date(ymd_hms(借閱時間)),
+    借閱年=year(借閱日期)
+  ) -> library100_102
+
+library100_102 %>%
+  filter(
+    借閱日期 %>% between(ymd("2014-09-01"),ymd("2015-06-30"))
+  ) -> library2014  
+
+library2014 %>%
+  group_by(學號) %>%
+  summarise(
+    學院=last(學院),
+    讀者年級=max(讀者年級)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    讀者年級=as.factor(讀者年級)
+    )-> library2014 
+
+library2014 %>%
+  mutate(
+    學院=reorder(學院,學號,length,order=T)
+  ) -> library2014
+
+library2014 %>% 
+  ggplot()-> graphList$圖書_ggplotOnly
+
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院), fill="#5A99B3", width=0.7
+    )
+```
+
+
+```{r}
+set.seed(2019)
+x <- rnorm(100)
+head(x)
+
+ggplot2::cut_interval(x,n=8) -> x_interval
+levels(x_interval)
+```
+
+
+```{r}
+data_frame(
+  x= x,
+  x_interval = x_interval
+)
+
+df_x <- data.frame(
+  x=x,
+  x_interval=x_interval
+)
+
+df_x %>%
+  group_by(x_interval) %>%
+  summarise(
+    interval_count=n()
+  ) %>%
+  ungroup() %>% #View
+  ggplot(aes(x=x_interval))+
+  geom_col(
+    aes(y=interval_count)
+  )
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
