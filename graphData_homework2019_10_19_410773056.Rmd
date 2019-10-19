@@ -55,6 +55,8 @@ save(nearsightedStud_sorted, file="uploadfile.Rda")
 load("uploadfile.Rda")
 
 graphData <- list()
+
+choose_palette(gui = "shiny")
 ```
 
 
@@ -74,13 +76,50 @@ nearsightedStud_sorted -> graphData$nearsightedStud
 
 #### 繪圖程式
 ```{r graph, echo=T, eval=T}
-#choose_palette(gui="shiny")
-colorspace::diverging_hcl(n = 5, h = c(180, 199), c = 59, l = c(74, 95), power = 1.5, register = "year_Palette")
+colorspace::sequential_hcl(n = 7, h = c(-4, 80), c = c(100, NA, 47), l = c(55, 96), power = c(1, NA), register = "YEAR-Palette")
 
 graphData$nearsightedStud%>%
   ggplot()+
-  geom_col(aes(x = 級別,y = 總近視學生人數,fill = 年分),position = position_dodge(0.65),width =0.5,color = "black",linetype = "solid",size = 0.8)+
-  scale_fill_continuous_diverging(palette("year_Palette"),nmax = 3)
+  geom_col(
+    aes(
+      x = 級別,
+      y = 總近視學生人數,
+      fill = 年分
+      ),
+    position = position_dodge(0.65),
+    width =0.5,
+    color = "black",
+    linetype = "solid",
+    size = 0.8
+    )+
+  scale_fill_discrete_sequential(
+    palette = "YEAR-Palette",
+    nmax = 5
+    )+
+  scale_x_discrete(
+    breaks = c("國小一年級","國小二年級","國小三年級"),
+    labels = c("一年級","二年級","三年級")
+  )+
+  theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid = element_line(colour = "black", size = 5),
+  panel.ontop = F,
+  panel.grid.major.y = element_line(colour = "gray50"),
+  panel.border =  element_rect(fill = NA,size = 1)
+)+
+  labs(
+    title = "臺灣2016至2018年國小一到三年級近視學生總人數趨勢圖",
+    tag = "(單位：人)",
+    caption = "資料來源：政府資料開放平台")+
+  theme(
+    plot.tag.position = "topleft",
+    plot.title = element_text(hjust = 0.5),
+    legend.title.align = 0.5,
+    axis.title.x.bottom = element_blank(),
+    axis.title.y.left = element_blank()
+    ) -> finalplot
+
+
 ```
 
 #### 設計說明
