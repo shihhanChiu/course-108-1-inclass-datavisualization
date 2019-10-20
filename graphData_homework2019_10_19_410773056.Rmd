@@ -43,7 +43,7 @@ library(shinyjs) # 支援套件
   * 作圖用資料物件生成(最後形成作圖資料物件graphData)
   
 ```{r data cleaning, echo=TRUE, eval=T}
-#資料載入 & 整理
+#資料載入 
 library(readr)
 nearsightedStud_sorted <- read_csv("C:/Users/Shihhan/Desktop/nearsighted_sorted.csv", 
     locale = locale(encoding = "BIG5"))
@@ -56,11 +56,10 @@ load("uploadfile.Rda")
 
 graphData <- list()
 
-choose_palette(gui = "shiny")
-```
+#choose_palette(gui = "shiny")
 
+#資料整理
 
-```{r data cleaning, echo=TRUE, eval=T}
 nearsightedStud_sorted %>%
   gather(`2014`,`2015`,`2016`,`2017`,`2018`,key = "年分",value = "近視學生人數")%>%
   group_by(級別,年分)%>%
@@ -69,8 +68,6 @@ nearsightedStud_sorted %>%
 slice(nearsightedStud_sorted,1:15)-> nearsightedStud_sorted
 filter(nearsightedStud_sorted,nearsightedStud_sorted$年分 == "2016" | nearsightedStud_sorted$年分 == "2017"|nearsightedStud_sorted$年分 == "2018") -> nearsightedStud_sorted
 nearsightedStud_sorted -> graphData$nearsightedStud
-
-
 
 ```
 
@@ -86,11 +83,11 @@ graphData$nearsightedStud%>%
       y = 總近視學生人數,
       fill = 年分
       ),
-    position = position_dodge(0.65),
-    width =0.5,
+    position = position_dodge(0.85),
+    width =0.65,
     color = "black",
     linetype = "solid",
-    size = 0.8
+    size = 0.76
     )+
   scale_fill_discrete_sequential(
     palette = "YEAR-Palette",
@@ -119,15 +116,20 @@ graphData$nearsightedStud%>%
     axis.title.y.left = element_blank()
     ) -> finalplot
 
-
+#finalplot
 ```
 
 #### 設計說明
 說明想傳達的訊息（必要）及設計想法（非必要）。寫在***之後
 
 *** 
+臺灣 2016 至 2018 年國小一年級至三年級近視學生總人數趨勢圖：
 
-此圖為西元2015年第三季至2019年第四季台灣經常帳餘額，期間餘額維持在200億美元上下。資料期間，最高餘額為2017年第三季，金額達280.19億美元，最低為2018年第三季，金額為112.98億美元。
+左方資料圖顯示國小一、二、三年級分別的各年度近視學生人數。從趨勢上分析，一年級人數有增加現象，尤其在 2018 年時(與前一年比較)上升幅度最大；二年級人數在 2017 年時減少，但在 2018 年時稍微回升，高峰時間是 2016 年；三年級人數是三級別中總數最多的，且在 2016 至 2018 年期間逐漸下降。
+
+設計想法：
+
+作圖者想呈現國小各年級在不同年度的人數趨勢，因此 X 軸以級別為類別，用漸層色的長條圖顯示其各年度之間的變化。
 ```{r}
 finalplot %>%
   ggplotly()
