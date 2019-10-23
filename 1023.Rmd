@@ -1,0 +1,25 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext)
+
+font_add(family="QYuan",regular="C:/Users/Shihhan/Desktop/cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+font.families()
+```
+
+
+```{r}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/homework3/graphData_homework3_005.Rda?raw=true"))
+```

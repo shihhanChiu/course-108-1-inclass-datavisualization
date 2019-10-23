@@ -45,7 +45,7 @@ library(shinyjs) # 支援套件
 ```{r data cleaning, echo=TRUE, eval=T}
 #資料載入 
 library(readr)
-nearsightedStud_sorted <- read_csv("nearsighted_sorted.csv", 
+nearsightedStud_sorted <- read_csv("C:/Users/Shihhan/Desktop/nearsighted_sorted.csv", 
     locale = locale(encoding = "BIG5"))
 
 #View(nearsightedStud_sorted)
@@ -114,9 +114,7 @@ graphData$nearsightedStud%>%
     legend.title.align = 0.5,
     axis.title.x.bottom = element_blank(),
     axis.title.y.left = element_blank()
-    ) -> finalplot
-
-#finalplot
+    ) 
 ```
 
 #### 設計說明
