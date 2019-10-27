@@ -1,0 +1,116 @@
+---
+title: "每週一圖作業繪圖說明檔"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+library(grDevices) # 不同顏色模型代碼的呈現及轉換
+library(scales) # show_col()螢幕立即顯示顏色
+library(colorspace) # 調色盤選擇及ggplot應用工具
+library(shinyjs) # 支援套件
+library(statebins)
+#choose_palette(gui="shiny")
+
+graphData$sub_2015_city_North %>% 
+  ggplot() + 
+  geom_point(
+    aes(
+      x = area, 
+      y = avg_nh
+    ), 
+    shape = 124, 
+    size = 10, 
+    color = "#00BFFF", 
+    alpha = 0.2
+  ) +
+  geom_point(
+    data = graphData$sub_2015_city_Central, 
+    aes(
+      x = area, 
+      y = avg_nh
+    ), 
+    shape = 124, 
+    size = 10, 
+    color = "#00BFFF", 
+  ) + 
+  geom_point(
+    data = graphData$sub_2015_city_South, 
+    aes(
+      x = area, 
+      y = avg_nh, 
+      ), 
+    shape = 124, 
+    size = 10, 
+    color = "#00BFFF",
+  ) + 
+  geom_point(
+    data = graphData$sub_2015_city_East_Islands, 
+    aes(
+      x = area, 
+      y = avg_nh, 
+      ), 
+    shape = 124, 
+    size = 10, 
+    color = "#00BFFF",
+  ) +
+  theme_bw(
+    base_size = 11, base_family = "",
+  base_line_size = 11/22, base_rect_size = 11/22
+  ) + 
+  theme(
+    panel.border = element_blank(), 
+    panel.grid.minor = element_blank() 
+  ) + 
+  theme(
+    axis.ticks = element_blank(), 
+    axis.title = element_blank()
+  ) + 
+  scale_x_discrete(
+    limits = c("East_Islands","South","Central","North"), 
+    breaks = c("East_Islands","South","Central","North"),
+    labels = c("東部\n離島","南部","中部","北部")
+  ) +
+  coord_flip()#+ 
+  labs(
+    title = "GNP per capita 2017", 
+    subtitle = "Source: World Bank", 
+    caption = "US$ thousand"
+  ) + 
+  theme(
+    plot.title = element_text(face = "bold"), 
+    plot.subtitle = element_text(color = "#AAAAAA"), 
+    plot.caption = element_text(color = "#666666")
+  ) -> 
+  graphData$godplot_eV
+
+  
+  
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***下一行。
+
+*** 
+
+
+

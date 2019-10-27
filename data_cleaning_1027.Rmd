@@ -1,0 +1,60 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/homework3/graphData_homework3_002.Rda?raw=true")) 
+
+n_area <- graphData$sub_2015_city$area
+
+c("North","North","North","Central","South","South","North","North","Central","Central","Central","Central","South","South","East_Islands","East_Islands","East_Islands","North","North","South","East_Islands","East_Islands") -> n_area
+
+n_area -> graphData$sub_2015_city$area
+
+graphData$sub_2015_city %>%
+  select(city,avg_nh,area)%>%
+  mutate(
+    city = c("新北市","台北市","桃園市","台中市","台南市","高雄市","宜蘭縣","新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","台東縣","花蓮縣","澎湖縣","基隆市","新竹市","嘉義市","金門縣","連江縣"),
+    area = factor(area,levels = c("North","Central","South","East_Islands")),
+  ) %>%
+  arrange(area,desc(avg_nh))-> graphData$sub_2015_city_new
+n_city <- graphData$sub_2015_city_new$city
+graphData$sub_2015_city_new%>%
+  mutate(
+    city = factor(city,levels = c(n_city))
+  )#-> graphData$sub_2015_city_new
+
+filter(graphData$sub_2015_city_new,str_detect(graphData$sub_2015_city_new$area,"North")) -> graphData$sub_2015_city_North
+
+
+filter(graphData$sub_2015_city_new,str_detect(graphData$sub_2015_city_new$area,"South")) -> graphData$sub_2015_city_South
+
+
+filter(graphData$sub_2015_city_new,str_detect(graphData$sub_2015_city_new$area,"Central")) -> graphData$sub_2015_city_Central
+
+filter(graphData$sub_2015_city_new,str_detect(graphData$sub_2015_city_new$area,"East_Islands")) -> graphData$sub_2015_city_East_Islands
+       
+
+
+```
+

@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
 library(tidyr); library(showtext)
 
-font_add(family="QYuan",regular="C:/Users/Shihhan/Desktop/cwTeXQYuan-Medium.ttf")
+font_add(family="QYuan",regular="cwTeXQYuan-Medium.ttf")
 showtext_auto(enable=TRUE) #啟用字體
 theme_set(theme_classic())
 knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
@@ -45,7 +45,7 @@ library(shinyjs) # 支援套件
 ```{r data cleaning, echo=TRUE, eval=T}
 #資料載入 
 library(readr)
-nearsightedStud_sorted <- read_csv("C:/Users/Shihhan/Desktop/nearsighted_sorted.csv", 
+nearsightedStud_sorted <- read_csv("nearsighted_sorted.csv", 
     locale = locale(encoding = "BIG5"))
 
 #View(nearsightedStud_sorted)
@@ -106,15 +106,15 @@ graphData$nearsightedStud%>%
 )+
   labs(
     title = "臺灣2016至2018年國小一到三年級近視學生總人數趨勢圖",
-    tag = "(單位：人)",
     caption = "資料來源：政府資料開放平台")+
   theme(
-    plot.tag.position = "topleft",
     plot.title = element_text(hjust = 0.5),
     legend.title.align = 0.5,
     axis.title.x.bottom = element_blank(),
     axis.title.y.left = element_blank()
-    ) 
+    ) -> graphData$nearsightedStud
+
+graphData$nearsightedStud
 ```
 
 #### 設計說明
@@ -128,8 +128,5 @@ graphData$nearsightedStud%>%
 設計想法：
 
 作圖者想呈現國小各年級在不同年度的人數趨勢，因此 X 軸以級別為類別，用漸層色的長條圖顯示其各年度之間的變化。
-```{r}
-finalplot %>%
-  ggplotly()
-```
+
 
