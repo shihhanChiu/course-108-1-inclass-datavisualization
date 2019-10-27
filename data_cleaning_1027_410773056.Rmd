@@ -53,8 +53,10 @@ filter(graphData$sub_2015_city_new,str_detect(graphData$sub_2015_city_new$area,"
 filter(graphData$sub_2015_city_new,str_detect(graphData$sub_2015_city_new$area,"Central")) -> graphData$sub_2015_city_Central
 
 filter(graphData$sub_2015_city_new,str_detect(graphData$sub_2015_city_new$area,"East_Islands")) -> graphData$sub_2015_city_East_Islands
-       
 
+save(graphData, file="uploadgraph.Rda")
+
+      
 
 ```
 

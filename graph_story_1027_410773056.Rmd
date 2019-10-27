@@ -31,6 +31,8 @@ library(shinyjs) # 支援套件
 library(statebins)
 #choose_palette(gui="shiny")
 
+load("uploadgraph.Rda")
+
 graphData$sub_2015_city_North %>% 
   ggplot() + 
   geom_point(
@@ -38,10 +40,10 @@ graphData$sub_2015_city_North %>%
       x = area, 
       y = avg_nh
     ), 
-    shape = 124, 
+    shape = 18, 
     size = 10, 
-    color = "#00BFFF", 
-    alpha = 0.2
+    color = "#00BBFF", 
+    alpha = 1
   ) +
   geom_point(
     data = graphData$sub_2015_city_Central, 
@@ -49,9 +51,9 @@ graphData$sub_2015_city_North %>%
       x = area, 
       y = avg_nh
     ), 
-    shape = 124, 
+    shape = 18, 
     size = 10, 
-    color = "#00BFFF", 
+    color = "#FF7744", 
   ) + 
   geom_point(
     data = graphData$sub_2015_city_South, 
@@ -59,26 +61,26 @@ graphData$sub_2015_city_North %>%
       x = area, 
       y = avg_nh, 
       ), 
-    shape = 124, 
+    shape = 18, 
     size = 10, 
-    color = "#00BFFF",
-  ) + 
+    color = "#FF8888",
+  ) +
   geom_point(
     data = graphData$sub_2015_city_East_Islands, 
     aes(
       x = area, 
       y = avg_nh, 
       ), 
-    shape = 124, 
+    shape = 18, 
     size = 10, 
-    color = "#00BFFF",
-  ) +
+    color = "#00AA00",
+  ) + 
   theme_bw(
-    base_size = 11, base_family = "",
-  base_line_size = 11/22, base_rect_size = 11/22
+    base_size = 20, base_family = "",
+  base_line_size = 20/22, base_rect_size = 20/22
   ) + 
   theme(
-    panel.border = element_blank(), 
+    panel.border = element_rect(fill = NA,color = "gray"), 
     panel.grid.minor = element_blank() 
   ) + 
   theme(
@@ -90,20 +92,45 @@ graphData$sub_2015_city_North %>%
     breaks = c("East_Islands","South","Central","North"),
     labels = c("東部\n離島","南部","中部","北部")
   ) +
-  coord_flip()#+ 
+  coord_flip()+
+   annotate(
+    "text",
+    x = 4,
+    y = 6.29,
+    label = "宜蘭縣",
+    vjust = -1.5
+  ) +
+  annotate(
+    "text",
+    x = 3,
+    y = 3.39,
+    label = "雲林縣",
+    vjust = -1.5
+  ) +
+  annotate(
+    "text",
+    x = 2,
+    y = 4.76,
+    label = "屏東縣",
+    vjust = -1.5
+  ) +
+  annotate(
+    "text",
+    x = 1,
+    y = 8.12,
+    label = "連江縣",
+    vjust = -1.5
+  )+
   labs(
-    title = "GNP per capita 2017", 
-    subtitle = "Source: World Bank", 
-    caption = "US$ thousand"
+    title = "臺灣各縣市平均每10,000位老人可使用的長照機構數量", 
+    subtitle = "2015年統計資料"
   ) + 
   theme(
-    plot.title = element_text(face = "bold"), 
-    plot.subtitle = element_text(color = "#AAAAAA"), 
-    plot.caption = element_text(color = "#666666")
-  ) -> 
-  graphData$godplot_eV
+    plot.title = element_text(face = "bold",hjust = 0.5), 
+    plot.subtitle = element_text(color = "#AAAAAA")
+  ) -> graphData$sub_2015_city_final
 
-  
+graphData$sub_2015_city_final
   
 ```
 
@@ -111,6 +138,8 @@ graphData$sub_2015_city_North %>%
 說明想傳達的訊息（必要）及設計想法（非必要）。寫在***下一行。
 
 *** 
+臺灣各縣市平均每10,000位老人可使用的長照機構數量：
 
+從圖中可發現，北部與東部離島區的數量較分散，中部及南部較集中，各地區平均數量最高的是<b>宜蘭縣</b>(6.29,北)、<b>雲林縣</b>(3.39,中)、<b>屏東縣</b>(4.76,南)、<b>連江縣</b>(8.12,東離)。
 
 
