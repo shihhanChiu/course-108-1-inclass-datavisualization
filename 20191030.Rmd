@@ -1,0 +1,190 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext)
+
+font_add(family="QYuan",regular="cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+font.families()
+```
+
+
+```{r}
+library(readr)
+library2014 <- read_csv("https://www.dropbox.com/s/999hy0u1y98y6ep/library2014.csv?dl=1")
+```
+
+
+```{r}
+ggplot()+theme_linedraw()+
+  scale_x_continuous(limits=c(0,6),breaks=0:6,
+                     expand=expand_scale(add=c(0,0)))+
+  scale_y_continuous(limits=c(0,6),breaks=0:6,
+                     expand=expand_scale(mult = c(0,0))) ->
+  myGrids
+
+myGrids
+```
+
+
+```{r}
+list_graphs <- list()
+list_geometryData <- list()
+list_geometryData$points <- 
+  rbind(
+    c(1,5),
+    c(2,1),
+    c(5,1),
+    c(5,5)) 
+
+list_geometryData$points %>%
+  as.data.frame() 
+
+myGrids +
+  geom_point(
+    data=as.data.frame(list_geometryData$points),
+    aes(x=V1,y=V2)
+  ) -> list_graphs$point
+
+myGrids +
+  geom_path(
+    data=as.data.frame(list_geometryData$points),
+    aes(x=V1,y=V2)
+  ) -> list_graphs$path
+
+myGrids +
+  geom_polygon(
+    data=as.data.frame(list_geometryData$points),
+    aes(x=V1,y=V2)
+  ) -> list_graphs$polygon
+
+ggpubr::ggarrange(
+  list_graphs$point, list_graphs$path, list_graphs$polygon,
+  ncol=3
+)
+```
+
+
+```{r}
+library(readr)
+#df_geo_northTW <- read_csv("https://www.dropbox.com/s/6uljw24zkyj7avs/df_geo_northTW.csv?dl=1")
+
+df_geo_northTW %>%
+  filter(COUNTYNAME == "新北市")#%>%
+  as.data.frame() -> df_part1
+df_geo_northTW %>%
+  filter(COUNTYNAME == "")
+  as.data.frame() -> df_part2
+
+df_part1 %>%
+  mutate(
+    sub_id=1
+  ) -> df_part1
+
+df_part2 %>%
+  mutate(
+    sub_id=2
+  ) -> df_part2
+
+bind_rows(
+  df_part1,
+  df_part2
+) -> df_all
+
+df_all %>%
+  mutate(
+    group_id="A"
+  ) -> df_all
+
+myGrids +
+  geom_polygon(
+    data=df_all,
+    aes(x=V1,y=V2, group=group_id, subgroup=sub_id)
+  )
+```
+
+
+```{r}
+df_geo_northTW %>%
+  ggplot()+
+  geom_polygon(
+    aes(x=x,y=y,fill=COUNTYNAME), color="azure4"
+  ) -> list_graphs$northTW
+list_graphs$northTW
+```
+
+
+```{r}
+# load(url("https://www.dropbox.com/s/9n7b1bcs09gnw0r/ggplot_newTaipei.Rda?dl=1")) # 前個練習若沒做出來，執行此行
+
+list_graphs$northTW +
+#  theme_linedraw()+
+  geom_path(
+    data=data.frame(
+      x=c(121.55,121.7,121.9),
+      y=c(25.1,24.7,24.7)
+      ),
+    aes(x=x,y=y)
+    )+
+  annotate(
+    "text",
+    x=121.9,y=24.71,label="這是臺北市",
+    vjust=0
+  )+
+  theme_void()
+```
+
+
+```{r}
+library(magick)
+image_read("https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/2450df20386177.562ea7d13f396.jpg") -> taipei101
+taipei101
+taipei101 %>%
+  image_info() -> taipei101info
+taipei101info
+
+ggplot()+theme_linedraw()+
+  theme(
+    panel.background = element_rect(fill="cyan4")
+  )
+
+theme_linedraw()+
+  theme(
+    panel.background = element_rect(fill="cyan4")
+  ) -> list_graphs$theme_backgroundCheck
+
+# 圖片底色非透明
+taipei101 %>%
+  image_ggplot()+
+  list_graphs$theme_backgroundCheck
+
+
+image_fill(taipei101, "transparent", point = "+100+100", fuzz = 30) %>% # fuzz=對邊界定義模糊度 %>%
+    image_ggplot()+list_graphs$theme_backgroundCheck
+
+image_fill(taipei101,"transparent", point = "+100+100", fuzz=30) -> 
+  taipei101transparent
+
+taipei101transparent %>%
+  as.raster() ->
+  raster_taipei101
+
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
