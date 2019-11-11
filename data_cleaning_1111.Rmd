@@ -1,0 +1,56 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+library(readr)
+studscore107 <- read_csv("studscore107.csv", 
+    locale = locale(encoding = "BIG5"))
+
+graphData <- list()
+studscore107 -> graphData$studscore107
+
+graphData$studscore107 %>%
+  mutate(
+    時間類別 = c(1,1,1,0.5,1,1,0.5,0.5,1,1,1,1,0.5,1,0.5,0.5,0.5),
+    時間類別 = as.character(時間類別),
+    學期  = as.character(學期)
+  ) -> graphData$studscore107
+
+graphData$studscore107 %>%
+  filter(時間類別 == 1)%>%
+  mutate(
+    狀況 = c(1,1,1,1,1,3,2,2,3,2),
+    狀況 = as.character(狀況)
+  )-> graphData$studscore107_all
+
+graphData$studscore107 %>%
+  filter(學期 == 1) -> graphData$studscore107_1
+
+graphData$studscore107 %>%
+  filter(學期 == 2)-> graphData$studscore107_2
+
+save(graphData,file = "graphData.Rda")
+
+# save(<所有在graph_story.Rmd要用的物件列出來，中間用逗號分隔>, file="graphData.Rda") # 此行放在最後一行
+```

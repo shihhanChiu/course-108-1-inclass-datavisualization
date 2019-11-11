@@ -1,0 +1,181 @@
+---
+title: "每週一圖作業繪圖說明檔"
+output: html_document
+params:
+  組員: ["小明","小花"]  
+  學號: ["410773818","410773293"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+# load("graphData.Rda") # 此行為第一行
+load("graphData.Rda")
+
+
+graphData$studscore107_all %>%
+  ggplot()+
+  geom_point(
+    aes(x = 科目名稱,
+        y = 成績,
+        shape = 狀況,
+        fill = 狀況),
+    size = 3
+  )+
+  scale_fill_manual(
+    name = "分數表現",
+    breaks = c(1,2,3),
+    labels = c("上學期","低於上學期","高於上學期"),
+    values = c("#FFAA33","#227700","#880000")
+  )+
+  scale_shape_manual(
+    name = "分數表現",
+    breaks = c(1,2,3),
+    labels = c("上學期","低於上學期","高於上學期"),
+    values = c(21,25,24)
+  )+
+  scale_x_discrete(
+    limits = c("經濟學原理","會計學","微積分","大一國文：經典閱讀與詮釋","電腦概論與程式設計"),
+    breaks = c("經濟學原理","會計學","微積分","大一國文：經典閱讀與詮釋","電腦概論與程式設計"),
+    labels = c("經濟學原理","會計學","微積分","大一國文","電腦概論與程式設計")
+  )+
+  annotate(
+    "text",
+    x = 0.8,
+    y = 85,
+    label = "85",
+    color = "black",
+    vjust = 1
+  )+
+  annotate(
+    "text",
+    x = 0.8,
+    y = 86,
+    label = "86",
+    color = "black",
+    vjust = 0
+  )+
+  annotate(
+    "text",
+    x = 1.8,
+    y = 99,
+    label = "99",
+    color = "black"
+  )+
+  annotate(
+    "text",
+    x = 1.8,
+    y = 92,
+    label = "92",
+    color = "black"
+  )+
+  annotate(
+    "text",
+    x = 2.8,
+    y = 89,
+    label = "89",
+    color = "black"
+  )+
+  annotate(
+    "text",
+    x = 2.8,
+    y = 74,
+    label = "74",
+    color = "black"
+  )+
+  annotate(
+    "text",
+    x = 3.8,
+    y = 93,
+    label = "93",
+    color = "black"
+  )+
+  annotate(
+    "text",
+    x = 3.8,
+    y = 97,
+    label = "97",
+    color = "black"
+  )+
+  annotate(
+    "text",
+    x = 4.8,
+    y = 97,
+    label = "97",
+    color = "black"
+  )+
+  annotate(
+    "text",
+    x = 4.8,
+    y = 71,
+    label = "71",
+    color = "black"
+  )+
+  theme_minimal(
+  )+
+  theme(
+    axis.title.x.bottom = element_blank(),
+    panel.background = element_rect(fill = "#FFFFF0"),
+    panel.border = element_rect(fill = NA,colour = "white"),
+    legend.position = "top",
+    plot.background = element_rect(fill = "#FFDAB9",colour = "white"),
+    plot.margin = unit(c(5,5,5,5),"mm")
+  )+
+  labs(
+    title = "大一修習全學年科目分數表現",
+    subtitle = "上下學期比較"
+  ) -> graphData$studscore107_all
+  
+
+library(magick)
+image_read("ReadingSideDoodle.png") -> read
+read %>%
+  image_info() -> readinfo
+# 檢視圖片高寬比
+readinfo$height/readinfo$width -> img_asp # image aspect ratio
+img_asp
+
+
+read %>%
+  as.raster() ->
+  raster_read
+
+loc <- c(x = 5,y = 85) # Taipei101 經緯度
+imgWidth <- 1 # Taipei101在圖片佔寬
+
+graphData$studscore107_all +
+  annotation_raster(
+    raster_read,
+    1.5,2.3,73,82) -> graphData$studscore107_all
+
+                      
+graphData$studscore107_all
+```
+
+
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***下一行。
+
+*** 
+
+【大一修習全學年科目分數表現—上下學期比較】
+
+由於想了解自己學習進退步情況，選擇用全學年的課程做比較。
+在作圖上使用geom_point，不同shape代表原始分數與高低差異。
+這次嘗試在上面放圖片，希望不會太突兀哈哈。
