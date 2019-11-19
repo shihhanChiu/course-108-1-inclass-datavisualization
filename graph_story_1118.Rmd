@@ -1,0 +1,295 @@
+---
+title: "每週一圖作業繪圖說明檔"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+#參考CV：https://www.cakeresume.com/search/ninawu860515
+
+graphData <- list()
+
+library(magick)
+
+image_read("social-media.png") -> media
+media %>%
+  as.raster() ->
+  raster_media
+
+image_read("promote.png") -> relation
+relation %>%
+  as.raster() ->
+  raster_relation
+
+image_read("learning.png") -> learn
+learn %>%
+  as.raster() ->
+  raster_learn
+
+image_read("calendar.png") -> calendar
+calendar %>%
+  as.raster() ->
+  raster_calendar
+
+image_read("check-list.png") -> checklist
+checklist %>%
+  as.raster() ->
+  raster_checklist
+
+image_read("best.png") -> winner
+winner %>%
+  as.raster() ->
+  raster_winner
+
+
+graphData$points_1 <- 
+  rbind(
+    c(2.5,5),
+    c(2.5,3.5),
+    c(3.16,3.5),
+    c(3.16,5)) 
+
+graphData$points_2 <- 
+  rbind(
+    c(3.5,5),
+    c(3.5,3.5),
+    c(7.84,3.5),
+    c(7.84,5)) 
+
+graphData$points_3 <- 
+  rbind(
+    c(4.47,5),
+    c(4.47,3.5),
+    c(4.87,3.5),
+    c(4.87,5))
+
+graphData$points_4 <- 
+  rbind(
+    c(5.76,5),
+    c(5.76,3.5),
+    c(6.16,3.5),
+    c(6.16,5))
+
+graphData$points_5 <- 
+  rbind(
+    c(9,4.2),
+    c(9,4.7),
+    c(9.2,4.7),
+    c(9.2,4.2))
+
+graphData$points_6 <- 
+  rbind(
+    c(8.5,4.2),
+    c(8.5,4.7),
+    c(8.7,4.7),
+    c(8.7,4.2))
+
+ggplot() +
+  theme_linedraw()+
+  scale_x_continuous(limits=c(0,10),breaks=0:10,
+                     expand=expand_scale(add=c(0,0)))+
+  scale_y_continuous(limits=c(0,10),breaks=0:10,
+                     expand=expand_scale(mult = c(0,0)))+
+  geom_polygon(
+    data=as.data.frame(graphData$points_1),
+    aes(x=V1,y=V2),
+    fill = "#A0522D"
+  )+
+  geom_polygon(
+    data=as.data.frame(graphData$points_2),
+    aes(x=V1,y=V2),
+    fill = "#FF8C00"
+  )+
+  geom_polygon(
+    data=as.data.frame(graphData$points_3),
+    aes(x=V1,y=V2),
+    fill = "#FF4500"
+  )+
+  geom_polygon(
+    data=as.data.frame(graphData$points_4),
+    aes(x=V1,y=V2),
+    fill = "#FFD700"
+  )+
+  geom_polygon(
+    data=as.data.frame(graphData$points_5),
+    aes(x=V1,y=V2),
+    fill = "#FFD700"
+  )+
+  geom_polygon(
+    data=as.data.frame(graphData$points_6),
+    aes(x=V1,y=V2),
+    fill = "#FF4500"
+  )+
+  coord_flip()+
+  annotate(
+    "text",
+    x = 2.8,
+    y = 6.6,
+    label = "人事助理實習生
+    廣州香江集團股份有限公司",
+    )+
+  geom_path(
+    data = data.frame(
+      x = c(2.7,3),
+      y = c(5,5.5)
+    ),
+    aes(x = x,y = y),
+    size = 1,
+    lineend = "round"
+  )+
+  geom_path(
+    data = data.frame(
+      x = c(6.8,7.2),
+      y = c(5,5.5)
+    ),
+    aes(x = x,y = y),
+    size = 1,
+    lineend = "round"
+  )+
+  annotate(
+    "text",
+    x = 7.2,
+    y = 6.8,
+    label = "新事業發展中心實習生
+    資策會產業分析情報研究所",
+    )+
+  geom_path(
+    data  = data.frame(
+      x = c(2.5,8),
+      y = c(3.2,3.2)
+    ),
+    aes(x = x,y = y),
+    size  = 1.14,
+    lineend = "round",
+    arrow =  arrow(angle = 30, length = unit(0.12, "inches"),
+      ends = "last", type = "open")
+  )+
+  annotate(
+    "text",
+    x = 7.7,
+    y = 2.3,
+    label = "2019.09"
+    )+
+  annotate(
+    "text",
+    x = 3.65,
+    y = 2.3,
+    label = "2018.09"
+    )+
+  annotate(
+    "text",
+    x = 3.2,
+    y = 2.3,
+    label = "2018.08",
+    )+
+  annotate(
+    "text",
+    x = 2.7,
+    y = 2.3,
+    label = "2018.07"
+    )+
+  annotate(
+    "text",
+    x = 4.67,
+    y = 2.3,
+    label = "2018.12"
+    )+
+  annotate(
+    "text",
+    x = 5.96,
+    y = 2.3,
+    label = "2019.04"
+    )+
+  annotation_raster(
+    raster_media,
+    5.3,6.2,5.5,6.3)+
+  annotation_raster(
+    raster_relation,
+    4.1,5,5.5,6.3)+
+  annotate(
+    "text",
+    x = 5.7,
+    y = 7.3,
+    label = "自媒體經營能力"
+    )+
+  annotate(
+    "text",
+    x = 4.5,
+    y = 7.2,
+    label = "人際關係連結"
+    )+
+  annotation_raster(
+    raster_learn,
+    1.2,2,5.3,6.1)+
+  annotation_raster(
+    raster_calendar,
+    1.2,2,6.7,7.3)+
+  annotation_raster(
+    raster_checklist,
+    1.2,2,7.7,8.5)+
+  annotate(
+    "text",
+    x = 0.7,
+    y = 5.65,
+    label = "主動學習"
+    )+
+  annotate(
+    "text",
+    x = 0.7,
+    y = 6.9,
+    label = "提高工作效率"
+    )+
+  annotate(
+    "text",
+    x = 0.7,
+    y = 8.17,
+    label = "解決問題"
+    )+
+  annotation_raster(
+    raster_winner,
+    8.5,9.5,3.5,4.1)+
+  annotate(
+    "text",
+    x = 9.1,
+    y = 7,
+    label = "滬港台三地上銀金融科技創新競賽--優勝獎 "
+    )+
+  annotate(
+    "text",
+    x = 8.6,
+    y = 7.2,
+    label = "上海銀行滬港台金融科技創新校園競賽--第一名"
+    )+
+  theme_void()+
+  theme(
+    panel.background = element_rect(fill = "#FFFFF0")
+  ) -> graphData$final_graph
+  
+graphData$final_graph
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***下一行。
+
+*** 
+我參考吳小姐的履歷，發現其實習經驗與競賽表現為最大亮點。
+因此以時間軸標示各項活動發生時間，以及實習過程培養的能力。

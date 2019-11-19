@@ -154,7 +154,7 @@ sf_mrt_tpe %>%
 
 
 ```{r}
-sf_taiwan=read_sf("C:/Users/Shihhan/Desktop/mapdata201907311006")
+sf_taiwan=read_sf("mapdata201907311006/COUNTY_MOI_1080726.shp")
 
 sf_taiwan %>%
   ggplot()+geom_sf()
