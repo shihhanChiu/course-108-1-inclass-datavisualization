@@ -1,0 +1,60 @@
+---
+title: "20191113"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr);
+library(tidyr); library(showtext);library(sf)
+
+font_add(family="QYuan",regular="cwTeXQYuan-Medium.ttf")
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+font.families()
+```
+
+
+```{r}
+# 取出spData套件附的world data
+data(world,package="spData")
+class(world) # 已是sf object
+sf_taiwan = read_sf("mapdata201907311006/COUNTY_MOI_1080726.shp")
+# 目前CRS
+
+sf_taiwan %>% st_crs() 
+
+sf_taiwan %>% 
+  st_transform(crs="+proj=longlat +datum=WGS84 +no_defs") -> sf_taiwan2
+
+sf_taiwan2 %>%
+  rmapshaper::ms_simplify() -> sf_taiwan2
+
+
+world %>% st_crs()
+
+world %>% st_geometry() %>%
+  geom_sf()+geom_sf(data = sf_taiwan2) -> world_tw
+
+
+world_tw %>%
+  st_crop(xmin = 119,xmax = 122,ymin = 24.6,ymax = 25.3)
+
+world_small%>% st_geometry() %>%
+  ggplot()+geom_sf() -> world_small
+
+
+
+library(osmdata)
+# open pass query with bounding box
+bbox_taipei <- opq(
+  bbox = c(121.4616,25.1050,121.6058,24.9894) 
+) 
+  
+
+```

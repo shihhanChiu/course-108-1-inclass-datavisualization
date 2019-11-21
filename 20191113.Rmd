@@ -110,8 +110,8 @@ write_sf(df_county12,"county12/county12.shp")
 
 
 ```{r}
-#load(url("https://www.dropbox.com/s/uvco1te2kbs6o01/MRT_Taipei.Rda?dl=1"))
-sf_mrt_tpe %>%
+load(url("https://www.dropbox.com/s/uvco1te2kbs6o01/MRT_Taipei.Rda?dl=1"))
+sf_mrtStops_tpe %>%
   filter(str_detect(經過路線,"BL")) -> sf_mrt_tpe_bl
 
 sf_mrt_tpe_bl %>%
@@ -124,20 +124,21 @@ sfg_mrt_bl %>%
 
 
 ```{r}
-sf_mrt_tpe_bl %>%
+sf_mrtStops_tpe %>%
   mutate(
     站號 = str_extract(
       經過路線 , "(?<=(BL))[:digit:]+" #取出前面是()的[數字]全
     ) 
   )%>%
-  arrange(站號) -> sf_mrt_tpe_bl
+  arrange(站號)%>%
+  filter(站號 <= 23)-> sf_mrt_tpe_bl
 
 sf_mrt_tpe_bl %>%
   st_coordinates() %>%
   st_linestring() -> sfg_mrt_bl
 
 sfg_mrt_bl %>%
-  ggplot()+geom_sf()
+  ggplot()+geom_sf() -> sfg_mrt_bl
 
 df_mrt <- data.frame(
   linename = "BL"
@@ -148,8 +149,53 @@ sfg_mrt_bl
 
 
 ```{r}
-sf_mrt_tpe %>%
-  filter(str_detect(經過路線,"")) -> sf_mrt_tpe_bl
+sf_mrtStops_tpe %>%
+  mutate(
+    站號 = str_extract(
+      經過路線 , "(?<=(O))[:digit:]+" #取出前面是()的[數字]全
+    ) 
+  )%>%
+  arrange(站號)%>%
+  filter(站號 <= 54)-> sf_mrt_tpe_O
+
+
+sf_mrt_tpe_O %>%
+  filter(站號 <= 21)-> sf_mrt_tpe_O1
+
+sf_mrt_tpe_O %>%
+  filter(站號 > 21)-> sf_mrt_tpe_O2
+
+sf_mrt_tpe_O1 %>%
+  st_coordinates() %>%
+  st_linestring() -> sfg_mrt_O1
+
+sf_mrt_tpe_O1 %>%
+  ggplot()+geom_sf()# -> sfg_mrt_O1
+
+df_mrt <- data.frame(
+  linename = "O1"
+)
+
+sfg_mrt_O1
+
+sf_mrt_tpe_O2 %>%
+  st_coordinates() %>%
+  st_linestring() -> sfg_mrt_O2
+
+sfg_mrt_O2 %>%
+  ggplot()+geom_sf() -> sfg_mrt_O2
+
+df_mrt <- data.frame(
+  linename = "O2"
+)
+
+sfg_mrt_O2
+
+
+load(url("https://www.dropbox.com/s/1jwm27dhh4874ch/sf_tpe_mrt.Rda?dl=1"))
+
+sf_taipei %>% st_crs
+
 ```
 
 
@@ -158,6 +204,33 @@ sf_taiwan=read_sf("mapdata201907311006/COUNTY_MOI_1080726.shp")
 
 sf_taiwan %>%
   ggplot()+geom_sf()
+```
+
+
+```{r}
+load(url("https://www.dropbox.com/s/uvco1te2kbs6o01/MRT_Taipei.Rda?dl=1"))
+
+sf_mrtStops_tpe %>%
+  st_crs() -> sf_mrtStops_tpe_crs
+sf_mrtStops_tpe_crs
+
+sf_mrtStops_tpe %>%
+  filter(
+    str_detect(經過路線,"BL")
+  ) -> sf_mrtStops_tpe_BL
+
+sf_mrtStops_tpe_BL %>% View
+
+sf_taipei %>%
+  ggplot()+geom_sf()+
+  geom_sf(
+    data=sf_mrtStops_tpe_BL
+  )+
+  coord_sf(
+    xlim=c(121.4,121.7),
+    ylim=c(24.9,25.1)
+  ) -> gg_tpe_mrt
+gg_tpe_mrt
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
