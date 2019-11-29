@@ -284,7 +284,10 @@ ggplot() +
     panel.background = element_rect(fill = "#FFFFF0")
   ) -> graphData$final_graph
   
-graphData$final_graph
+ggsave(filename="graph013.png", graphData$final_graph)
+
+
+
 ```
 
 #### 設計說明
