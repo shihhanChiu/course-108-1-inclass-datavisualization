@@ -25,7 +25,14 @@ knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
 
 ```{r graph, echo=T, eval=T}
 # load("graphData.Rda") # 此行為第一行
+library(dplyr); library(rvest); library(stringr)
+source("https://www.dropbox.com/s/4tubw8e5h3cem6w/theEconomist.R?dl=1")
 
+"https://www.economist.com/the-world-this-week/2019/11/21/politics-this-week" %>%
+  get_theWorldThisWeek() -> df_politics
+
+"https://www.economist.com/the-world-this-week/2019/11/21/business-this-week" %>%
+  get_theWorldThisWeek() -> df_business
 ```
 
 
@@ -35,8 +42,3 @@ knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
 
 *** 
 
-【大一修習全學年科目分數表現—上下學期比較】
-
-由於想了解自己學習進退步情況，選擇用全學年的課程做比較。
-在作圖上使用geom_point，不同shape代表原始分數與高低差異。
-這次嘗試在上面放圖片，希望不會太突兀哈哈。

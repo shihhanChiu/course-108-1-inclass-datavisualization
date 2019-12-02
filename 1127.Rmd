@@ -163,3 +163,190 @@ graph$northTaiwan_with_BL+
   )
 ```
 
+
+```{r}
+library(osmdata)
+
+st_layers("map.osm")
+
+st_read("map.osm",layer="lines") -> sf_ltsh_lines
+
+
+sf_ltsh_lines %>%
+  ggplot()+geom_sf()
+
+
+st_read("map.osm",layer="points") -> sf_ltsh_points
+
+sf_ltsh_points %>%
+  ggplot()+geom_sf()
+
+st_read("map.osm",layer="multipolygons") -> sf_ltsh_multipolygons
+
+sf_ltsh_multipolygons %>%
+  ggplot()+geom_sf() -> gg_ltsh
+
+gg_ltsh +
+  geom_sf(
+    data = sf_ltsh_lines
+  )+
+  geom_sf(data = sf_ltsh_points,aes(color = highway))+
+  coord_sf(
+    xlim  = c(121.76,121.765),
+    ylim = c(24.68,24.6845)
+  )
+```
+
+
+
+```{r}
+library(osmdata)
+# open pass query with bounding box
+bbox_disney <- opq(
+  bbox = c(-117.9239,33.8088,-117.9154,33.8154) 
+) 
+bbox_disney %>% 
+  add_osm_feature(
+    key="tourism", value="theme_park"
+  ) %>%
+  osmdata_sf() -> map_disney
+
+map_disney$osm_polygons %>%
+  ggplot()+geom_sf()
+```
+
+
+```{r}
+library(osmdata)
+bbox_taipei <- opq(
+  bbox = c(121.4616,25.1050,121.6058,24.9894) 
+) 
+
+bbox_taipei %>%
+  add_osm_feature(
+    key="admin_level", value="5"
+  ) %>%
+  osmdata_sf() -> map_taipei_boundary
+
+map_taipei_boundary  
+
+map_taipei_boundary$osm_multipolygons -> map_taipei
+
+download.file("https://www.dropbox.com/s/8ndtvzqbdb4cb93/data_visulaization_pk.R?dl=1",destfile = "data_visulaization_pk.R")
+osm_geom_rename <- function(sf_object){
+  sf_object %>%
+    st_geometry() -> sfc_sf_object
+  for(i in seq_along(sfc_sf_object)){
+    names(sfc_sf_object[[i]][[1]]) <-
+      1:length(names(sfc_sf_object[[i]][[1]]))
+  }
+  
+  sf_object %>%
+    st_set_geometry(
+      sfc_sf_object
+    ) -> sf_object2
+  return(sf_object2)
+}
+
+
+
+map_taipei %>%
+  osm_geom_rename() %>%
+  ggplot()+
+  geom_sf()+
+  geom_sf_text(aes(label=name), size=5/.pt)
+```
+
+
+```{r}
+billionaire <- 
+  read_csv("https://www.dropbox.com/s/cpu4f09x3j78wqi/billionaire.csv?dl=1") %>%
+  rename(
+    "Year"="X1"
+  )
+
+billionaire %>%
+  ggplot()+geom_line(
+    aes(x=Year,y=Russia)
+  ) +
+  scale_y_continuous(
+    breaks=seq(0,200,by=50)
+  ) +
+  theme_linedraw()-> plot_russia
+
+billionaire %>%
+  ggplot()+geom_line(
+    aes(x=Year,y=World)
+  )+
+  scale_y_continuous(
+    breaks=seq(0,2000,by=500)
+  ) +
+  theme_linedraw()-> plot_world
+
+f <- function(x) x/10
+f_inverse <- function(f_value) 10*f_value
+
+billionaire %>%
+  mutate(
+    World2=f(World)
+  ) -> billionaire
+
+billionaire %>%
+  ggplot()+
+  geom_line(
+    aes(x=Year,y=Russia), color="blue", size=2
+  ) +
+  geom_line(
+    aes(x=Year,y=World2), color="brown", size=2
+  ) + 
+  scale_y_continuous(
+    limits=c(-1,230),
+    breaks=seq(0,200,by=50),
+    expand=expand_scale(mult=c(0,0)),
+    sec.axis = sec_axis(  # 設定右Y軸
+      trans=f_inverse,
+      name="Rest of the World"
+    )
+  ) +
+  theme_bw() -> plot_sec_axis 
+
+plot_sec_axis
+```
+
+
+```{r}
+load(url("https://www.dropbox.com/s/r21jg0vxf77geu9/plot_tree.Rda?dl=1"))
+
+plot_tree
+
+plot_tree +
+  scale_x_continuous(
+    sec.axis = dup_axis()
+  ) 
+
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/homework6/graphData_homework6_021.Rda?raw=true"))
+source("https://www.dropbox.com/s/0ydtqtxu5guy6i1/theme_lin.R?dl=1")  -> a
+
+
+resume_df %>% 
+  mutate(開始 = ymd(開始), 結束 = ymd(結束))  -> resume_df
+resume_df %>%
+  ggplot(
+    aes(x = 開始, y = 項目)) +    
+  geom_text(
+    aes(label = 名稱), size = 2.5) + 
+  geom_segment(
+    aes(
+      xend = 結束, yend = 項目, color = 分類, size = 2, alpha = 1
+      )
+    ) +
+  scale_x_date(
+      breaks = seq(as.Date("2015-01-01"), as.Date("2020-01-01"), by="1 year"),
+      labels = scales::date_format("%Y")
+      )+
+  labs(title = "Kuo, Shih-Jung  郭士榮", subtitle = "熱愛挑戰不設限、豐富國際經驗、在學三份實習") + 
+  theme_lin() -> gg_basic
+
+gg_basic
+```
+
