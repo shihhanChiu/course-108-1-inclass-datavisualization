@@ -1,37 +1,127 @@
 ---
-title: "Untitled"
+title: "經濟學人世界一周大事"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
+    orientation: rows
 ---
+    
+Row  {data-height=800}
+-------------------------------------
+```{r basic setup, message=FALSE, echo=TRUE, eval=T,include=FALSE}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales);
+library(tidyr); library(showtext); library(tidyverse); library(colorspace);library(sf);library(cowplot)
 
-```{r setup, include=FALSE}
-library(flexdashboard)
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+
+graphData <- list()
+
+Country <-c("Sri Lanka",
+        "Honkong",
+        "US",
+        "South Korea",
+        "US",
+        "Afghanistan",
+        "US",
+        "Iran",
+        "Israel",
+        "US",
+        "Syria",
+        "Burkina Faso",
+        "Mali",
+        "Niger",
+        "Brazil",
+        "Chile",
+        "Bolivia",
+        "Britain",
+        "Sweden",
+        "Belarus")
+Event <- c("Election",
+"Defiance",
+"Law",
+"Diplomatic",
+"Diplomatic",
+"Law",
+"Election",
+"Defiance",
+"Defiance",
+"Defiance",
+"Defiance",
+"Defiance",
+"Defiance",
+"Defiance",
+"Environment",
+"Environment",
+"Environment",
+"Environment",
+"Environment",
+"Environment"
+)
+politics <- data.frame(Country,Event)
 ```
 
-Column {data-width=650}
------------------------------------------------------------------------
+    
+### Map
+    
+```{r,fig.width=10, fig.height=7}
 
-### Chart A
+load(file = "df_politics_news.rda") 
+
+data(world,package="spData")
+world %>% st_geometry() %>%
+  ggplot()+geom_sf()+geom_sf(data = df_politics_news,aes(fill = "#FF7744"))+
+  theme(legend.position = "none") -> graphData$politicsNewsMap
+graphData$politicsNewsMap
+```
+
+
+### Statistic
+```{r,fig.width=10, fig.height=7}
+graphData$politicsCategory <- politics
+
+graphData$politicsCategory %>%
+  ggplot()+
+  geom_point( aes(
+    x = Event,
+    y = Country,
+    colour = Event,
+    size = 10
+  ))+
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_rect(fill = 	"#FFFAF0"),
+        axis.line = element_line(colour = "#8B4513"),
+        axis.ticks = element_line(colour = "#8B4513"),
+        axis.text = element_text(colour = "#8B4513",)
+        )+
+  coord_fixed(ratio = 0.123)+
+  theme(
+    axis.text = element_text(size = 30)
+  )-> graphData$politicsCategory_graph
+
+graphData$politicsCategory_graph +
+  coord_flip() -> graphData$politicsCategory_graph
+
+
+
+
+graphData$politicsCategory_graph
+```
+
+   
+Row {.tabset}
+-------------------------------------
+   
+### Chart 1
 
 ```{r}
-
-
-```
-
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Chart B
-
+```   
+ 
+### Chart 2
+    
 ```{r}
-
 ```
-
-### Chart C
-
-```{r}
-
-```
-
