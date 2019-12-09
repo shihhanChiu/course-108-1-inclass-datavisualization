@@ -1,0 +1,128 @@
+---
+title: "每週一圖作業"
+output: html_document
+params:
+  組員: ["李靜怡"]  
+  學號: ["410773095"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace); library(ggpubr); library(magick);
+library(sf); library(rmapshaper);library(magrittr)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+load("df_politics_news.rda")
+
+list() -> map
+
+data(world,package = "spData")
+
+world[1,] 
+
+world %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = df_politics_news, fill = "red",
+          alpha = 0.5, size = 1) +
+  theme_void()-> map$all
+
+
+world %>%
+  filter(
+    continent == "Africa"
+  ) %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Africa")),
+          fill = "red",
+          alpha = 0.5, size =1) +
+  theme_void() -> map$Africa
+
+world %>%
+  filter(
+    region_un == "Americas"
+  ) %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Americas")),
+          fill = "red",
+          alpha = 0.5, size = 1) +
+  theme_void() -> map$Americas
+
+world %>%
+  .[-which(world$iso_a2 == "RU"),] %>%
+  filter(
+    region_un == "Europe"
+  ) %>%
+  st_crop(
+    xmin = -30, xmax = 80,
+    ymin = 0, ymax = 75
+  ) %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Europe")),
+          fill = "red",
+          alpha = 0.5, size = 1) +
+  theme_void() -> map$Europe
+  
+library(osmdata)
+# open pass query with bounding box
+bbox_HK <- opq(
+  bbox = c(113.7827,22.0827,114.4171,22.5692) 
+) 
+
+bbox_HK %>% 
+  add_osm_feature(
+    key="admin_level", value="5"
+  ) %>%
+  osmdata_sf() -> map_HK_administrative
+
+map_HK_administrative
+
+map_HK_administrative$osm_lines -> map_HK_line
+
+
+world %>%
+  filter(
+    region_un == "Asia"
+  )%>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Asia")),
+          fill = "red",
+          alpha = 0.5, size = 1) +
+  geom_sf(data = map_HK_line,aes(color = "red",size = 1))+
+  theme_void()+
+  theme(
+    legend.position = "none"
+  )-> map$Asia
+
+
+class(map$Asia)
+
+
+save(map,file = "map.rda")
+``` 
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***下一行。
+*** 
+於世界地圖標示國家，並依地域(洲)分類繪製大圖。
