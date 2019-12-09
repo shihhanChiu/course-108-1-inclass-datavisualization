@@ -72,7 +72,7 @@ load(file = "df_politics_news.rda")
 
 data(world,package="spData")
 world %>% st_geometry() %>%
-  ggplot()+geom_sf()+geom_sf(data = df_politics_news,aes(fill = "#FF7744"))+
+  ggplot()+geom_sf()+geom_sf(data = df_politics_news,fill = "#FF7744")+
   theme(legend.position = "none") -> graphData$politicsNewsMap
 graphData$politicsNewsMap
 ```
@@ -100,7 +100,7 @@ graphData$politicsCategory %>%
         )+
   coord_fixed(ratio = 0.123)+
   theme(
-    axis.text = element_text(size = 30)
+    axis.text = element_text(size = 10)
   )-> graphData$politicsCategory_graph
 
 graphData$politicsCategory_graph +

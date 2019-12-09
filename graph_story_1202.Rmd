@@ -25,7 +25,7 @@ knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
 
 ```{r graph, echo=T, eval=T}
 graphData <- list()
-
+load(file = "df_politics_news.rda")
 Country <-c("Sri Lanka",
         "Honkong",
         "US",
