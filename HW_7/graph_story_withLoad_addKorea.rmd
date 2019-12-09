@@ -13,7 +13,7 @@ params:
 rm(list=ls())
 library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
 library(tidyr); library(showtext); library(tidyverse); library(colorspace); library(ggpubr); library(magick);
-library(sf); library(rmapshaper)
+library(sf); library(rmapshaper);library(magrittr)
 
 #font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
 showtext_auto(enable=TRUE) #啟用字體
@@ -96,7 +96,7 @@ world %>%
           alpha = 0.5, size = 1) +
   theme_void()-> map$Asia
 
-
+class(map$Asia)
 
 
 save(map,file = "map.rda")

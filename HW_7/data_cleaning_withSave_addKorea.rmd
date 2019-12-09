@@ -24,12 +24,14 @@ knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
   
 ```{r data cleaning, echo=TRUE, eval=T}
 ## 資料讀入
-
 library(dplyr); library(rvest); library(stringr)
 source("https://www.dropbox.com/s/4tubw8e5h3cem6w/theEconomist.R?dl=1")
 
 "https://www.economist.com/the-world-this-week/2019/11/21/politics-this-week" %>%
   get_theWorldThisWeek() -> df_politics
+
+"https://www.economist.com/the-world-this-week/2019/11/21/business-this-week" %>%
+  get_theWorldThisWeek() -> df_business
 
 data(world,package = "spData")
 
@@ -42,12 +44,9 @@ df_politics$identities[11] %>%
 
 a[[1]] -> df_politics$identities[c(11,18,19)]
 
-
 df_politics$identities %>%
-  str_replace("’s","")%>%
-  str_sub(2,-2)-> df_politics$identities
-
-df_politics
+  str_sub(2,-2) %>%
+  str_replace("’s","") -> df_politics$identities
 
 df_politics$identities[15] <- "United Kingdom"
 df_politics$identities[c(3,6)] <- "United States"
@@ -59,7 +58,23 @@ df_politics$identities[4] <- "Republic of Korea"
 world[(world$name_long %in%
   df_politics$identities),] -> df_politics_news
 
-save(df_politics_news,
-     file = "df_politics_news.rda")
+
+library(osmdata)
+# open pass query with bounding box
+bbox_HK <- opq(
+  bbox = c(113.5217,22.0309,114.7989,22.6748) 
+) 
+
+bbox_HK %>% 
+  add_osm_feature(
+    key="boundary", value="administrative"
+  ) %>%
+  osmdata_sf() -> map_HK_administrative
+
+map_HK_administrative
+
+
+
+
 ```
 

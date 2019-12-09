@@ -2,8 +2,8 @@
 title: "每週一圖作業資料檔"
 output: html_document
 params:
-  組員: ["彭亦楓"]  
-  學號: ["410773109"]
+  組員: ["彭亦楓","李靜怡","鄭喬翊","曾雨晴","邱詩涵"]  
+  學號: ["410773109","","","","410773056"]
 ---
 
 #### 環境設定
@@ -12,7 +12,8 @@ params:
 ```{r basic setup, message=FALSE, echo=TRUE, eval=T}
 rm(list=ls())
 library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
-library(tidyr); library(showtext); library(tidyverse); library(colorspace);library(sf)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace); library(ggpubr); library(magick);
+library(sf); library(rmapshaper);library(magrittr)
 
 #font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
 showtext_auto(enable=TRUE) #啟用字體
@@ -31,16 +32,18 @@ load("df_politics_news.rda")
 
 
 ```{r}
+class(df_politics_news)
+
 
 ##1.取出"歐洲"的國家
 (df_politics_news$region_un=="Europe")  
 
 ##2.把"歐洲"df 其中geom資料由polygon轉為中心點
 df_politics_news[(df_politics_news$region_un=="Europe"),] %>%
-  st_centroid(of_largest_polygon = T) -> df_cente_Europer
+  st_centroid(of_largest_polygon = T) -> df_center_Europe
 
 ##3.取出中心點的座標
-df_cente_Europer%>%
+df_center_Europe%>%
   st_coordinates() -> coordinates_Europe
 
 ##4.處理資料
@@ -71,10 +74,10 @@ map$Europe_label
 ```{r}
 ##把"Americas"df 其中geom資料由polygon轉為中心點
 df_politics_news[(df_politics_news$region_un=="Americas"),] %>%
-  st_centroid(of_largest_polygon = T) -> df_cente_Americas
+  st_centroid(of_largest_polygon = T) -> df_center_Americas
 
 ##取出中心點的座標
-df_cente_Americas%>%
+df_center_Americas%>%
   st_coordinates() -> coordinates_Americas
 
 ##處理資料
@@ -118,10 +121,10 @@ map$Americas_label
 ```{r}
 ##把"Asia"df 其中geom資料由polygon轉為中心點
 df_politics_news[(df_politics_news$region_un=="Asia"),] %>%
-  st_centroid(of_largest_polygon = T) -> df_cente_Asia
+  st_centroid(of_largest_polygon = T) -> df_center_Asia
 
 ##取出中心點的座標
-df_cente_Asia%>%
+df_center_Asia%>%
   st_coordinates() -> coordinates_Asia
 
 ##處理資料
@@ -160,10 +163,10 @@ map$Asia_label
 ```{r}
 
 df_politics_news[7,] %>%
-  st_centroid(of_largest_polygon = T) -> df_cente_Faso
+  st_centroid(of_largest_polygon = T) -> df_center_Faso
 
 ##取出中心點的座標
-df_cente_Faso%>%
+df_center_Faso%>%
   st_coordinates() -> coordinates_Faso
 
 ##處理資料
