@@ -1,0 +1,167 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales);library(rio)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+## 資料讀入
+rio::import("ufoFromFb.csv") -> ufoFromFb
+rio::import("ufoFromWeb.csv") -> ufoFromWeb
+rio::import("ufoFromPoster.csv") -> ufoFromPoster
+## 資料整理
+
+graphData <- list()
+
+str_replace_all(ufoFromFb$timestamp,"/","-")-> ufoFromFb$timestamp
+str_replace_all(ufoFromWeb$timestamp,"/","-")-> ufoFromWeb$timestamp
+str_replace_all(ufoFromPoster$timestamp,"/","-")-> ufoFromPoster$timestamp
+
+# FB cleaning
+
+ufoFromFb %>%
+  slice(-c(63:71)) -> ufoFromFb_tm
+
+ufoFromFb_tm %>%
+  slice(c(1:16)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,9),
+    when = str_sub(timestamp,11,12)
+  ) -> ufoFromFb_tm_1
+
+ufoFromFb_tm %>%
+  slice(c(17:62)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,10),
+    when = str_sub(timestamp,12,13)
+  ) -> ufoFromFb_tm_2
+
+rbind(ufoFromFb_tm_1,ufoFromFb_tm_2) -> ufoFromFb_tm
+
+str_replace_all(ufoFromFb_tm$when,":","") -> ufoFromFb_tm$when
+as.numeric(as.factor(ufoFromFb_tm$when)) -> ufoFromFb_tm$when
+
+# Web cleaning
+
+ufoFromWeb %>%
+  slice(-c(72:80)) -> ufoFromWeb_tm
+
+
+ufoFromWeb_tm %>%
+  slice(c(1:23)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,10),
+    when = str_sub(timestamp,12,13)
+  )-> ufoFromWeb_tm_1
+
+ufoFromFb_tm %>%
+  slice(c(24:71)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,10),
+    when = str_sub(timestamp,12,13)
+  ) -> ufoFromWeb_tm_2
+
+rbind(ufoFromWeb_tm_1,ufoFromWeb_tm_2) -> ufoFromWeb_tm
+
+str_replace_all(ufoFromWeb_tm$when,":","") -> ufoFromWeb_tm$when
+as.numeric(as.factor(ufoFromWeb_tm$when)) -> ufoFromWeb_tm$when
+# Postercleaning
+
+ufoFromPoster %>%
+  slice(-c(53:72)) -> ufoFromPoster_tm
+
+
+ufoFromPoster_tm %>%
+  slice(c(1:10)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,10),
+    when = str_sub(timestamp,12,13)
+  )-> ufoFromPoster_tm_1
+
+ufoFromPoster_tm %>%
+  slice(c(11:52)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,10),
+    when = str_sub(timestamp,12,13)
+  ) -> ufoFromPoster_tm_2
+
+rbind(ufoFromPoster_tm_1,ufoFromPoster_tm_2) -> ufoFromPoster_tm
+
+str_replace_all(ufoFromPoster_tm$when,":","") -> ufoFromPoster_tm$when
+as.numeric(as.factor(ufoFromPoster_tm$when)) -> ufoFromPoster_tm$when
+
+# individual part
+
+ufoFromFb_tm %>%
+  filter(`event title`=="北大玩具節") -> ToyfestivalFromFb
+
+ufoFromFb_tm %>%
+  filter(`event title`=="青銀共賞電影") -> MovieFromFb
+
+ufoFromFb_tm %>%
+  filter(`event title`=="聖誕點燈暨北大管樂節") -> ChristmasFromFb
+
+ufoFromWeb_tm %>%
+  filter(`event title`=="北大玩具節") -> ToyfestivalsFromWeb
+
+ufoFromWeb_tm %>%
+  filter(`event title`=="青銀共賞電影") -> MovieFromWeb
+
+ufoFromWeb_tm %>%
+  filter(`event title`=="聖誕點燈暨北大管樂節") -> ChristmasFromWeb
+
+ufoFromPoster_tm %>%
+  filter(`event title`=="北大玩具節") -> ToyfestivalsFromPoster
+
+ufoFromPoster_tm %>%
+  filter(`event title`=="青銀共賞電影") -> MovieFromPoster
+
+ufoFromPoster_tm %>%
+  filter(`event title`=="聖誕點燈暨北大管樂節") -> ChristmasFromPoster
+
+graphData$ufoFromFb_tm <- ufoFromFb_tm
+graphData$ufoFromWeb_tm <- ufoFromWeb_tm
+graphData$ufoFromPoster_tm <- ufoFromPoster_tm
+graphData$ToyFestivalFromFb <- ToyfestivalFromFb
+graphData$MovieFromFb <- MovieFromFb
+graphData$ChristmasFromFb <- ChristmasFromFb
+
+```
+
+
+
+```{r graph, echo=T, eval=T}
+
+ufoFromFb_tm$Date -> tm0
+
+
+graphData$ufoFromFb %>%
+  ggplot()+
+  geom_point(aes(x = Date, y = when))+
+  scale_x_discrete(
+    limits = c(tm0),
+    breaks = c("2019-11-3","2019-11-7","2019-11-19","2019-11-22","2019-11-27","2019-12-17"),
+    labels = c("11/3","11/7","11/19","11/22","11/27","12/17")
+  )
+
+
+
+```
