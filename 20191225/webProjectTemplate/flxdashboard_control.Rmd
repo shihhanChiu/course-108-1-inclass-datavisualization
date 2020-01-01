@@ -12,7 +12,14 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-library(flexdashboard)
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales);library(rio)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace);library(flexdashboard)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
 ```
 
 控制台 {.sidebar}
@@ -20,36 +27,31 @@ library(flexdashboard)
 
 
 
-<div id="example" width="100%" height="100%"></div>
-<script type="text/javascript" src="https://pym.nprapps.org/pym.v1.min.js"></script>
-<script>
-    var pymParent = new pym.Parent("example", "myControl.html", {});
-</script>
 
 
 
-Column {data-width=650}
+
+Column {data-width=800}
 -----------------------------------------------------------------------
 
-### Chart A 
+### Chart A
 
-```{r}
-
-```
-
-
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Chart B
-
-```{r}
+<div id="ufoFb">
+```{r,eval=FALSE}
+load("ufoFromFb_tm_graph.rda")
+ufoFromFb_tm_graph
+gridSVG::grid.export("ufoFromFb_tm_graph.svg",addClasses=TRUE)
 
 ```
+<object id="myObject" data="ufoFromFb_tm_graph.svg" type="image/svg+xml" width="100%"></object>
 
-### Chart C
+</div>
+
+Column {data-width = 200}
+-------------------------------------
+   
+### Chart 2
+
 
 ```{r}
-
-```
-
+```   
