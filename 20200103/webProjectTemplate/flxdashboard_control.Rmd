@@ -37,14 +37,8 @@ Column {data-width=800}
 ### Chart A
 
 <div id="ufoFb">
-```{r,eval=FALSE}
-load("ufoFromFb_tm_graph.rda")
-ufoFromFb_tm_graph
-gridSVG::grid.export("ufoFromFb_tm_graph.svg",addClasses=TRUE)
 
-```
-<object id="myObject" data="ufoFromFb_tm_graph.svg" type="image/svg+xml" width="100%"></object>
-
+<object id="myObject" data="ufoFromFb_tm_graph.svg" type="image/svg+xml"  width="100%"></object>
 </div>
 
 Column {data-width = 200}

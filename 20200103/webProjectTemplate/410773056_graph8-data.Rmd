@@ -1,0 +1,139 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["邱詩涵"]  
+  學號: ["410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales);library(rio)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+## 資料讀入
+ufoFromFb <- read.table("ufoFromFb.csv", encoding = "utf-8", header = TRUE, sep = ",")
+
+
+## 資料整理
+
+graphData <- list()
+str_replace_all(ufoFromFb$timestamp,"/","-")-> ufoFromFb$timestamp
+
+# FB cleaning
+
+ufoFromFb %>%
+  slice(-c(63:71)) -> ufoFromFb_tm
+
+
+ufoFromFb_tm %>%
+  slice(c(1:16)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,9),
+    when = str_sub(timestamp,11,12)
+  ) -> ufoFromFb_tm_1
+
+ufoFromFb_tm %>%
+  slice(c(17:62)) %>%
+  mutate(
+    Date = str_sub(timestamp,1,10),
+    when = str_sub(timestamp,12,13)
+  ) -> ufoFromFb_tm_2
+
+rbind(ufoFromFb_tm_1,ufoFromFb_tm_2) -> ufoFromFb_tm
+as.numeric(ufoFromFb_tm$when) -> ufoFromFb_tm$when
+ymd(as.factor(ufoFromFb_tm$Date)) -> ufoFromFb_tm$Date
+
+
+graphData$ufoFromFb_tm <- ufoFromFb_tm
+
+
+```
+
+
+
+```{r graph, echo=T, eval=T}
+
+ufoFromFb_tm$Date -> tm0
+as.numeric(ufoFromFb_tm$when) -> ufoFromFb_tm$when
+ufoFromFb_tm$when -> tm1
+max(tm1) -> yend
+
+
+
+
+graphData$ufoFromFb_tm %>%
+  ggplot()+
+  geom_rect(
+            aes(
+    xmin = ymd("2019-11-3"),
+    xmax = ymd("2019-11-8"),
+    ymin = 0,
+    ymax = yend),
+    fill = "#FFE4B5",
+    alpha = 0.02 
+  )+
+  geom_rect(
+            aes(
+    xmin = ymd("2019-11-18"),
+    xmax = ymd("2019-11-27"),
+    ymin = 0,
+    ymax = yend),
+    fill = "#FFE4B5",
+    alpha = 0.02 
+  )+
+  geom_rect(
+            aes(
+    xmin = ymd("2019-12-16"),
+    xmax = ymd("2019-12-17"),
+    ymin = 0,
+    ymax = yend),
+    fill = "#FFE4B5",
+    alpha = 0.02 
+  )+
+  geom_hline(yintercept = 12,
+             linetype = "longdash",
+             size = 0.8,
+             alpha = 0.5,
+             color = "black"
+  )+
+  geom_point(aes(x= Date,
+                y= when,
+                group = 1,colour = event.title)
+    )+
+  scale_y_discrete(
+    limits = c(tm1),
+    breaks = c("6","12","18","24"),
+    labels = c("6","12","18","24")
+  )+
+  scale_color_discrete(name="活動名稱")+
+  theme(
+    axis.title = element_blank(),
+    axis.line = element_line(color = "black", size = 0.8),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(), 
+    axis.text.y = element_text(margin = margin(t = 0, r = 6, b = 0, l = 0, unit = "pt")),
+    plot.margin = margin(t = 0, r = 0, b = 0, l = 15, unit = "pt"),
+    legend.position = "none",
+    ) -> ufoFromFb_tm_graph
+
+
+ufoFromFb_tm_graph
+save(ufoFromFb_tm_graph,yend, file="ufoFromFb_tm_graph.rda")
+
+
+
+
+```
