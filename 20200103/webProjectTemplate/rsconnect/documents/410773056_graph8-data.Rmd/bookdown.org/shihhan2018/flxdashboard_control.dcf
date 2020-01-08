@@ -1,12 +1,12 @@
 name: flxdashboard_control
-title: flxdashboard_control
+title:
 username: shihhan2018
 account: shihhan2018
 server: bookdown.org
 hostUrl: https://bookdown.org/__api__
 appId: 3547
-bundleId: 17200
+bundleId: 17187
 url: https://bookdown.org/shihhan2018/flxdashboard_control/
-when: 1578466069.48182
+when: 1578458915.48631
 asMultiple: TRUE
 asStatic: TRUE

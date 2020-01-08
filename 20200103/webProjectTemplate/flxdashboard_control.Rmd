@@ -1,16 +1,9 @@
 ---
-title: "範本"
+title: "UFO活動網路報名分析"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
-    css: ['css/mystyle.css']
-    includes:
-      in_header: ["external/in_header/header.html"]
-      before_body: ["external/before_body/bf_body.html"]
-      after_body: ["external/after_body/af_body.html"]
+    orientation: rows
 ---
-
 ```{r setup, include=FALSE}
 rm(list=ls())
 library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales);library(rio)
@@ -21,31 +14,20 @@ showtext_auto(enable=TRUE) #啟用字體
 theme_set(theme_classic())
 knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
 ```
-
-控制台 {.sidebar}
-------------------------
-
-
-
-
-
-
-
-Column {data-width=800}
------------------------------------------------------------------------
-
-### Chart A
-
-<div id="ufoFb">
-
-<object id="myObject" data="ufoFromFb_tm_graph.svg" type="image/svg+xml"  width="100%"></object>
-</div>
-
-Column {data-width = 200}
--------------------------------------
    
-### Chart 2
+Row {data-height=650}
+-------------------------------------
 
+### 臉書報名
 
 ```{r}
+load(file = "ufoForm_graph.rda")
+ufoFromFb_tm_graph
+```
+
+   
+### 報名管道統計
+```{r}
+ufoTotalCount_graph
 ```   
+

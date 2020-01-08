@@ -25,14 +25,14 @@ knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
 ```{r data cleaning, echo=TRUE, eval=T}
 ## 資料讀入
 ufoFromFb <- read.table("ufoFromFb.csv", encoding = "utf-8", header = TRUE, sep = ",")
-
+totalCount <- read.table("totalCount.csv",encoding = "utf-8", header = TRUE, sep = ",")
 
 ## 資料整理
 
 graphData <- list()
 str_replace_all(ufoFromFb$timestamp,"/","-")-> ufoFromFb$timestamp
 
-# FB cleaning
+## FB cleaning
 
 ufoFromFb %>%
   slice(-c(63:71)) -> ufoFromFb_tm
@@ -56,8 +56,8 @@ rbind(ufoFromFb_tm_1,ufoFromFb_tm_2) -> ufoFromFb_tm
 as.numeric(ufoFromFb_tm$when) -> ufoFromFb_tm$when
 ymd(as.factor(ufoFromFb_tm$Date)) -> ufoFromFb_tm$Date
 
-
 graphData$ufoFromFb_tm <- ufoFromFb_tm
+graphData$totalCount <- totalCount
 
 
 ```
@@ -65,25 +65,25 @@ graphData$ufoFromFb_tm <- ufoFromFb_tm
 
 
 ```{r graph, echo=T, eval=T}
+## 臉書報名
 
 ufoFromFb_tm$Date -> tm0
 as.numeric(ufoFromFb_tm$when) -> ufoFromFb_tm$when
-ufoFromFb_tm$when -> tm1
+c(1:24) -> tm1
 max(tm1) -> yend
-
-
-
 
 graphData$ufoFromFb_tm %>%
   ggplot()+
+  theme(
+    panel.background = element_rect(fill = "#F5F5F5")
+  )+
   geom_rect(
             aes(
     xmin = ymd("2019-11-3"),
     xmax = ymd("2019-11-8"),
     ymin = 0,
     ymax = yend),
-    fill = "#FFE4B5",
-    alpha = 0.02 
+    fill = "#FFFFFF",
   )+
   geom_rect(
             aes(
@@ -91,8 +91,7 @@ graphData$ufoFromFb_tm %>%
     xmax = ymd("2019-11-27"),
     ymin = 0,
     ymax = yend),
-    fill = "#FFE4B5",
-    alpha = 0.02 
+    fill = "#FFFFFF",
   )+
   geom_rect(
             aes(
@@ -100,18 +99,24 @@ graphData$ufoFromFb_tm %>%
     xmax = ymd("2019-12-17"),
     ymin = 0,
     ymax = yend),
-    fill = "#FFE4B5",
-    alpha = 0.02 
+    fill = "#FFFFFF",
   )+
   geom_hline(yintercept = 12,
              linetype = "longdash",
              size = 0.8,
              alpha = 0.5,
-             color = "black"
+             color = "#DAA520"
+  )+
+  geom_hline(yintercept = 6,
+             linetype = "longdash",
+             size = 0.8,
+             alpha = 0.5,
+             color = "#DAA520"
   )+
   geom_point(aes(x= Date,
                 y= when,
-                group = 1,colour = event.title)
+                group = 1,colour = event.title),
+             size = 2
     )+
   scale_y_discrete(
     limits = c(tm1),
@@ -122,18 +127,52 @@ graphData$ufoFromFb_tm %>%
   theme(
     axis.title = element_blank(),
     axis.line = element_line(color = "black", size = 0.8),
+    axis.text.y = element_text(margin = margin(t = 0, r = 6, b = 0, l = 0, unit = "pt"),size = 15),
     axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(), 
-    axis.text.y = element_text(margin = margin(t = 0, r = 6, b = 0, l = 0, unit = "pt")),
-    plot.margin = margin(t = 0, r = 0, b = 0, l = 15, unit = "pt"),
-    legend.position = "none",
-    ) -> ufoFromFb_tm_graph
+    axis.ticks = element_blank(),
+    axis.line.x = element_blank(),
+    axis.line.y = element_line(colour = "#808080",size = 2),
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 15),
+    title = element_text(size = 30)
+    )+
+  labs(
+    title = "UFO 活動臉書報名時間分布圖"
+  )-> ufoFromFb_tm_graph
 
 
-ufoFromFb_tm_graph
-save(ufoFromFb_tm_graph,yend, file="ufoFromFb_tm_graph.rda")
+
+```
 
 
+```{r graph, echo=T, eval=T}
+## 總統計
 
+
+graphData$totalCount%>%
+  ggplot()+
+  geom_col(aes(x = where, y = num, fill = eventTitle))+
+  scale_fill_manual(values = c("北大玩具節" = "#FFBB66" ,"青銀共賞電影" = "#DDFF77","聖誕點燈暨北大管樂節" = "#FF6347"))+
+  theme(
+    axis.line = element_blank(),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 15,color = "#FFFFFF",face = "bold"),
+    axis.title = element_blank(),
+     axis.ticks = element_blank(),
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 15,color = "#FFFFFF"),
+    plot.background = element_rect(fill = "#C0C0C0"),
+    panel.background = element_rect(fill = "#C0C0C0"),
+    legend.background = element_rect(fill = "#C0C0C0"),
+    title = element_text(size = 30,color = "#FFFFFF")
+    )+
+  labs(
+    title = "UFO 活動報名管道分布"
+  )-> ufoTotalCount_graph
+
+
+save(ufoFromFb_tm_graph,yend,tm1,ufoTotalCount_graph,file="ufoForm_graph.rda")
 
 ```
