@@ -138,7 +138,7 @@ graphData$ufoFromFb_tm %>%
     title = element_text(size = 30)
     )+
   labs(
-    title = "UFO 活動臉書報名時間分布圖"
+    title = "UFO 活動臉書點擊時間分布圖"
   )-> ufoFromFb_tm_graph
 
 
@@ -169,7 +169,7 @@ graphData$totalCount%>%
     title = element_text(size = 30,color = "#FFFFFF")
     )+
   labs(
-    title = "UFO 活動報名管道分布"
+    title = "UFO 活動點擊分布"
   )-> ufoTotalCount_graph
 
 
